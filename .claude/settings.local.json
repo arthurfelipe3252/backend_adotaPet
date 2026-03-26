@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp -r temp_nest/* temp_nest/.* .)",
+      "Bash(rm -rf temp_nest)",
+      "Bash(npm install:*)",
+      "Bash(npx nest:*)",
+      "Bash(rm -rf src/database)",
+      "Bash(mkdir -p src/shared/infra/database)",
+      "Bash(mkdir -p src/modules)",
+      "Bash(mkdir -p .claude/commands)"
+    ]
+  }
+}

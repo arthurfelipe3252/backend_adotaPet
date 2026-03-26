@@ -22,3 +22,17 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Coverage
+/coverage
