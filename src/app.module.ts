@@ -1,11 +1,13 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { SharedModule } from "@shared/shared.module";
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { SharedModule } from '@shared/shared.module';
+import { IdentityModule } from '@identity/identity.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     SharedModule,
+    IdentityModule,
   ],
 })
 export class AppModule {}

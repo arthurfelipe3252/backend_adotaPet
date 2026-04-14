@@ -1,6 +1,7 @@
-import { Injectable, type OnModuleDestroy } from "@nestjs/common";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { Injectable, type OnModuleDestroy } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 
 const schema = {};
 
@@ -9,9 +10,9 @@ export class DrizzleService implements OnModuleDestroy {
   private readonly pool: Pool;
   public readonly db;
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
+      connectionString: this.configService.get<string>('DATABASE_URL'),
     });
 
     this.db = drizzle(this.pool, { schema });
