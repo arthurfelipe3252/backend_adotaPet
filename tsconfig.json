@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "resolvePackageJsonExports": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "isolatedModules": true,
     "declaration": true,
@@ -22,16 +21,36 @@
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@shared/*": ["src/shared/*"],
-      "@identity/*": ["src/modules/identity/*"],
-      "@catalog/*": ["src/modules/catalog/*"],
-      "@match/*": ["src/modules/match/*"],
-      "@adoption/*": ["src/modules/adoption/*"],
-      "@chat/*": ["src/modules/chat/*"],
-      "@timeline/*": ["src/modules/timeline/*"],
-      "@geo/*": ["src/modules/geo/*"],
-      "@notifications/*": ["src/modules/notifications/*"],
-      "@payments/*": ["src/modules/payments/*"]
+      "@shared/*": [
+        "src/shared/*"
+      ],
+      "@identity/*": [
+        "src/modules/identity/*"
+      ],
+      "@catalog/*": [
+        "src/modules/catalog/*"
+      ],
+      "@match/*": [
+        "src/modules/match/*"
+      ],
+      "@adoption/*": [
+        "src/modules/adoption/*"
+      ],
+      "@chat/*": [
+        "src/modules/chat/*"
+      ],
+      "@timeline/*": [
+        "src/modules/timeline/*"
+      ],
+      "@geo/*": [
+        "src/modules/geo/*"
+      ],
+      "@notifications/*": [
+        "src/modules/notifications/*"
+      ],
+      "@payments/*": [
+        "src/modules/payments/*"
+      ]
     }
   }
 }
