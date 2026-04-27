@@ -20,6 +20,9 @@ export const petStatusEnum = pgEnum("pet_status", [
 
 export const petsSchema = pgTable("pets", {
   id: uuid("id").primaryKey().defaultRandom(),
+  // FK lógica → identity.protetores_ongs.id. Sem FK física porque cruza
+  // bounded contexts (catalog → identity), o que é vedado pelas regras de
+  // DDD do projeto (ver CLAUDE.md). A integridade fica a cargo do serviço.
   protetorId: uuid("protetor_id").notNull(),
   nome: varchar("nome", { length: 100 }).notNull(),
   especie: especieEnum("especie").notNull(),

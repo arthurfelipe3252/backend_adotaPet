@@ -1,11 +1,18 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json } from 'express';
 import { DomainExceptionFilter } from '@shared/infra/http/filters/domain-exception.filter';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Limite de body JSON elevado: cadastros de protetor/ONG enviam foto +
+  // documento comprobatório em base64 inline. Cada um vai até ~5 MB de
+  // arquivo binário (~7 MB em base64); 20 MB cobre o pior caso (foto +
+  // documento) com folga.
+  app.use(json({ limit: '20mb' }));
 
   // Prefixo global de API. Todas as rotas viram /api/v1/<rota>.
   app.setGlobalPrefix('api/v1');
@@ -46,6 +53,8 @@ async function bootstrap() {
     )
     .addTag('Users', 'Gerenciamento de usuários')
     .addTag('Auth', 'Autenticação, login, refresh e logout')
+    .addTag('Adotantes', 'Cadastro de adotantes (pessoa física)')
+    .addTag('Protetores e ONGs', 'Cadastro de protetores e organizações')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

@@ -37,8 +37,9 @@ export class DrizzlePetRepository implements PetRepository {
   // ── CRUD ───────────────────────────────────────────────────────────────────
 
   async create(pet: Pet): Promise<void> {
+    // id é omitido propositalmente: quando o pet é novo, deixamos o
+    // defaultRandom() da coluna gerar o uuid no banco.
     await this.drizzle.db.insert(petsSchema).values({
-      id: pet.id,
       protetorId: pet.protetorId,
       nome: pet.nome,
       especie: pet.especie,

@@ -10,7 +10,6 @@ export interface UsuarioRestoreProps {
   email: string;
   senhaHash: string;
   telefone?: string | null;
-  imagemBase64?: string | null;
   tipoUsuario: TipoUsuario;
   ativo: boolean;
   createdAt: Date;
@@ -19,13 +18,15 @@ export interface UsuarioRestoreProps {
 
 /**
  * Props para criar um novo Usuario (ainda sem id, será gerado pelo banco).
+ *
+ * `imagemBase64` NÃO está aqui: a foto de perfil pertence à entidade filha
+ * (Adotante / ProtetorOng), evitando duplicação de dados na tabela mãe.
  */
 export interface UsuarioCreateProps {
   nome: string;
   email: string;
   senhaHash: string;
   telefone?: string;
-  imagemBase64?: string;
   tipoUsuario: TipoUsuario;
 }
 
@@ -39,7 +40,6 @@ export class Usuario {
   private _email!: string;
   private _senhaHash!: string;
   private _telefone?: string;
-  private _imagemBase64?: string;
   private _tipoUsuario!: TipoUsuario;
   private _ativo!: boolean;
   private readonly _createdAt?: Date;
@@ -71,10 +71,6 @@ export class Usuario {
 
   get telefone(): string | undefined {
     return this._telefone;
-  }
-
-  get imagemBase64(): string | undefined {
-    return this._imagemBase64;
   }
 
   get tipoUsuario(): TipoUsuario {
@@ -128,11 +124,6 @@ export class Usuario {
     return this;
   }
 
-  withImagemBase64(imagemBase64?: string): this {
-    this._imagemBase64 = imagemBase64;
-    return this;
-  }
-
   withTipoUsuario(tipo: TipoUsuario): this {
     this._tipoUsuario = tipo;
     return this;
@@ -161,7 +152,6 @@ export class Usuario {
     entity._email = props.email;
     entity._senhaHash = props.senhaHash;
     entity._telefone = props.telefone ?? undefined;
-    entity._imagemBase64 = props.imagemBase64 ?? undefined;
     entity._tipoUsuario = props.tipoUsuario;
     entity._ativo = props.ativo;
     return entity;
@@ -178,7 +168,6 @@ export class Usuario {
       .withEmail(props.email)
       .withSenhaHash(props.senhaHash)
       .withTelefone(props.telefone)
-      .withImagemBase64(props.imagemBase64)
       .withTipoUsuario(props.tipoUsuario)
       .ativar();
     return entity;

@@ -1,6 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { DrizzleService } from '@shared/infra/database/drizzle.service';
+import type { DbExecutor } from '@shared/infra/database/types';
 import { TipoUsuario } from '@identity/usuarios/domain/enums/tipo-usuario.enum';
 import { Usuario } from '@identity/usuarios/domain/models/usuario.entity';
 import { UsuarioRepository } from '@identity/usuarios/domain/repositories/usuario-repository.interface';
@@ -18,16 +19,16 @@ type UsuarioRow = typeof usuariosSchema.$inferSelect;
 export class DrizzleUsuarioRepository implements UsuarioRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
-  async criar(usuario: Usuario): Promise<Usuario> {
+  async criar(usuario: Usuario, executor?: DbExecutor): Promise<Usuario> {
+    const db = executor ?? this.drizzle.db;
     try {
-      const [row] = await this.drizzle.db
+      const [row] = await db
         .insert(usuariosSchema)
         .values({
           nome: usuario.nome,
           email: usuario.email,
           senhaHash: usuario.senhaHash,
           telefone: usuario.telefone,
-          imagemBase64: usuario.imagemBase64,
           tipoUsuario: usuario.tipoUsuario,
           ativo: usuario.ativo,
         })
@@ -44,19 +45,29 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
     }
   }
 
-  async atualizar(usuario: Usuario): Promise<void> {
-    await this.drizzle.db
-      .update(usuariosSchema)
-      .set({
-        nome: usuario.nome,
-        email: usuario.email,
-        senhaHash: usuario.senhaHash,
-        telefone: usuario.telefone,
-        imagemBase64: usuario.imagemBase64,
-        ativo: usuario.ativo,
-        updatedAt: new Date(),
-      })
-      .where(eq(usuariosSchema.id, usuario.id!));
+  async atualizar(usuario: Usuario, executor?: DbExecutor): Promise<Usuario> {
+    const db = executor ?? this.drizzle.db;
+    try {
+      const [row] = await db
+        .update(usuariosSchema)
+        .set({
+          nome: usuario.nome,
+          email: usuario.email,
+          senhaHash: usuario.senhaHash,
+          telefone: usuario.telefone,
+          ativo: usuario.ativo,
+          updatedAt: new Date(),
+        })
+        .where(eq(usuariosSchema.id, usuario.id!))
+        .returning();
+      return Usuario.restaurar(this.paraDominio(row))!;
+    } catch (error) {
+      // Email novo pode bater com unique de outro usuário durante PATCH.
+      if (this.isUniqueViolation(error)) {
+        throw new ConflictException('Email já cadastrado');
+      }
+      throw error;
+    }
   }
 
   async desativar(id: string): Promise<void> {
@@ -100,7 +111,6 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
       email: row.email,
       senhaHash: row.senhaHash,
       telefone: row.telefone,
-      imagemBase64: row.imagemBase64,
       tipoUsuario: row.tipoUsuario as TipoUsuario,
       ativo: row.ativo,
       createdAt: row.createdAt,

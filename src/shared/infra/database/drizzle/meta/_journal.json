@@ -8,6 +8,20 @@
       "when": 1775765091002,
       "tag": "0000_last_shotgun",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1775765091003,
+      "tag": "0001_initial_v2",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1775765091004,
+      "tag": "0002_imagem_base64_no_filho_e_documento",
+      "breakpoints": true
     }
   ]
 }

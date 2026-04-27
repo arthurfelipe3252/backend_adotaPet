@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -8,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { AlterarSenhaDto } from '@identity/usuarios/application/dto/alterar-senha.dto';
 import { AtualizarUsuarioDto } from '@identity/usuarios/application/dto/atualizar-usuario.dto';
-import { CriarUsuarioDto } from '@identity/usuarios/application/dto/criar-usuario.dto';
 import { Usuario } from '@identity/usuarios/domain/models/usuario.entity';
 import {
   USUARIO_REPOSITORY,
@@ -37,32 +35,6 @@ export class UsuarioService {
     @Inject(REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepository: RefreshTokenRepository,
   ) {}
-
-  /**
-   * Cria um novo usuário (registro). Lança ConflictException se o email
-   * já existir. Hasheia a senha antes de persistir.
-   */
-  async criar(dto: CriarUsuarioDto): Promise<Usuario> {
-    // Check otimista — o repositório também captura erro de unique constraint
-    // como defesa contra race condition entre o check e o insert.
-    const existente = await this.usuarioRepository.buscarPorEmail(dto.email);
-    if (existente) {
-      throw new ConflictException('Email já cadastrado');
-    }
-
-    const senhaHash = await this.passwordHasher.hash(dto.senha);
-
-    const usuario = Usuario.criar({
-      nome: dto.nome,
-      email: dto.email,
-      senhaHash,
-      telefone: dto.telefone,
-      imagemBase64: dto.imagemBase64,
-      tipoUsuario: dto.tipoUsuario,
-    });
-
-    return this.usuarioRepository.criar(usuario);
-  }
 
   /**
    * Busca um usuário pelo id.
@@ -106,25 +78,11 @@ export class UsuarioService {
       usuario.withNome(dto.nome);
     }
 
-    if (dto.email !== undefined && dto.email !== usuario.email) {
-      // Email mudou: precisa checar duplicação contra outro usuário.
-      const existente = await this.usuarioRepository.buscarPorEmail(dto.email);
-      if (existente && existente.id !== id) {
-        throw new ConflictException('Email já cadastrado');
-      }
-      usuario.withEmail(dto.email);
-    }
-
     if (dto.telefone !== undefined) {
       usuario.withTelefone(dto.telefone);
     }
 
-    if (dto.imagemBase64 !== undefined) {
-      usuario.withImagemBase64(dto.imagemBase64);
-    }
-
-    await this.usuarioRepository.atualizar(usuario);
-    return usuario;
+    return this.usuarioRepository.atualizar(usuario);
   }
 
   /**
@@ -148,8 +106,7 @@ export class UsuarioService {
     const novoHash = await this.passwordHasher.hash(dto.senhaNova);
     usuario.withSenhaHash(novoHash);
 
-    await this.usuarioRepository.atualizar(usuario);
-    return usuario;
+    return this.usuarioRepository.atualizar(usuario);
   }
 
   /**

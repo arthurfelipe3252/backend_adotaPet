@@ -8,7 +8,6 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  Post,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -21,40 +20,23 @@ import {
 } from '@nestjs/swagger';
 import { AlterarSenhaDto } from '@identity/usuarios/application/dto/alterar-senha.dto';
 import { AtualizarUsuarioDto } from '@identity/usuarios/application/dto/atualizar-usuario.dto';
-import { CriarUsuarioDto } from '@identity/usuarios/application/dto/criar-usuario.dto';
 import { UsuarioResponseDto } from '@identity/usuarios/application/dto/usuario-response.dto';
 import { UsuarioService } from '@identity/usuarios/application/services/usuario.service';
 import type { AuthenticatedUser } from '@identity/usuarios/infra/auth/types/authenticated-user.type';
 import { CurrentUser } from '@identity/usuarios/infra/decorators/current-user.decorator';
 import { JwtAuthGuard } from '@identity/usuarios/infra/guards/jwt-auth.guard';
 
+/**
+ * Endpoints de gestão do usuário-mãe.
+ *
+ * O cadastro inicial NÃO acontece aqui: cada tipo de usuário tem o seu
+ * endpoint atômico (POST /users/adotantes, POST /users/protetores-ongs)
+ * porque cada um precisa criar um registro filho na mesma transação.
+ */
 @ApiTags('Users')
 @Controller('users')
 export class UsuariosController {
   constructor(private readonly usuarioService: UsuarioService) {}
-
-  // ----------------------------------------------------------------
-  // POST /users — registro público
-  // ----------------------------------------------------------------
-  @Post()
-  @ApiOperation({
-    summary: 'Registra um novo usuário',
-    description:
-      'Endpoint público de cadastro. Retorna o usuário criado sem a senha. ' +
-      'Use POST /users/auth/login em seguida para obter os tokens de acesso.',
-  })
-  @ApiBody({ type: CriarUsuarioDto })
-  @ApiResponse({
-    status: 201,
-    description: 'Usuário criado com sucesso',
-    type: UsuarioResponseDto,
-  })
-  @ApiResponse({ status: 400, description: 'Dados de entrada inválidos' })
-  @ApiResponse({ status: 409, description: 'Email já cadastrado' })
-  async criar(@Body() dto: CriarUsuarioDto): Promise<UsuarioResponseDto> {
-    const usuario = await this.usuarioService.criar(dto);
-    return UsuarioResponseDto.deUsuario(usuario);
-  }
 
   // ----------------------------------------------------------------
   // GET /users/me — perfil próprio
@@ -150,8 +132,10 @@ export class UsuariosController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
-    summary: 'Atualiza dados do usuário',
-    description: 'Somente o próprio usuário pode alterar seus dados.',
+    summary: 'Atualiza dados básicos do usuário (nome, telefone)',
+    description:
+      'Somente o próprio usuário pode alterar seus dados. ' +
+      'Email e tipoUsuario são imutáveis após o cadastro.',
   })
   @ApiParam({ name: 'id', description: 'UUID do usuário' })
   @ApiBody({ type: AtualizarUsuarioDto })
@@ -160,10 +144,6 @@ export class UsuariosController {
   @ApiResponse({ status: 401, description: 'Token ausente ou inválido' })
   @ApiResponse({ status: 403, description: 'Tentando alterar outro usuário' })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado' })
-  @ApiResponse({
-    status: 409,
-    description: 'Email já cadastrado por outro usuário',
-  })
   async atualizar(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: AtualizarUsuarioDto,

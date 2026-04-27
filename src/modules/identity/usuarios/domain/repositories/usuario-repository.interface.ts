@@ -1,3 +1,4 @@
+import type { DbExecutor } from '@shared/infra/database/types';
 import { Usuario } from '@identity/usuarios/domain/models/usuario.entity';
 
 /**
@@ -13,13 +14,22 @@ export interface UsuarioRepository {
   /**
    * Insere um novo usuário e retorna a entidade com id gerado.
    * Lança ConflictException se o email já existir (capturando código 23505).
+   *
+   * @param executor Opcional. Quando o caller já abriu uma transação Drizzle
+   *                 (ex: cadastro atômico de adotante/protetor), passe `tx`
+   *                 aqui para participar da mesma transação. Se omitido, usa
+   *                 o `db` raiz do DrizzleService.
    */
-  criar(usuario: Usuario): Promise<Usuario>;
+  criar(usuario: Usuario, executor?: DbExecutor): Promise<Usuario>;
 
   /**
    * Atualiza os campos mutáveis do usuário e seta updated_at = now.
+   * Retorna a entidade reconstruída com o novo `updatedAt` do banco.
+   *
+   * @param executor Opcional. Para participar de transação aberta em
+   *                 camada superior (ex: PATCH /users/adotantes/me).
    */
-  atualizar(usuario: Usuario): Promise<void>;
+  atualizar(usuario: Usuario, executor?: DbExecutor): Promise<Usuario>;
 
   /**
    * Soft delete: seta ativo = false e updated_at = now. Não apaga a linha.

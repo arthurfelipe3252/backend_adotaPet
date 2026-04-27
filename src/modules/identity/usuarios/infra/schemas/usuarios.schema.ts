@@ -2,7 +2,6 @@ import {
   boolean,
   pgEnum,
   pgTable,
-  text,
   timestamp,
   uuid,
   varchar,
@@ -32,7 +31,6 @@ export const usuariosSchema = pgTable('usuarios', {
   email: varchar('email', { length: 150 }).notNull().unique(),
   senhaHash: varchar('senha_hash', { length: 255 }).notNull(),
   telefone: varchar('telefone', { length: 20 }),
-  imagemBase64: text('imagem_base64'),
   tipoUsuario: tipoUsuarioEnum('tipo_usuario').notNull(),
   ativo: boolean('ativo').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true })

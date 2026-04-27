@@ -3,9 +3,19 @@ import { ConfigService } from '@nestjs/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { petsSchema } from '@catalog/pets/infra/schemas/pet.schema';
+import { adotantesSchema } from '@identity/adotantes/infra/schemas/adotantes.schema';
+import { enderecosSchema } from '@identity/enderecos/infra/schemas/enderecos.schema';
+import { protetoresOngsSchema } from '@identity/protetores_ongs/infra/schemas/protetores-ongs.schema';
+import { refreshTokensSchema } from '@identity/usuarios/infra/schemas/refresh-tokens.schema';
+import { usuariosSchema } from '@identity/usuarios/infra/schemas/usuarios.schema';
 
 const schema = {
   pets: petsSchema,
+  usuarios: usuariosSchema,
+  refreshTokens: refreshTokensSchema,
+  enderecos: enderecosSchema,
+  adotantes: adotantesSchema,
+  protetoresOngs: protetoresOngsSchema,
 };
 
 @Injectable()

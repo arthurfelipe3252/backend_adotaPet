@@ -2,6 +2,9 @@ CREATE TYPE "public"."especie" AS ENUM('cao', 'gato', 'outro');--> statement-bre
 CREATE TYPE "public"."pet_status" AS ENUM('disponivel', 'em_processo', 'adotado');--> statement-breakpoint
 CREATE TYPE "public"."porte" AS ENUM('pequeno', 'medio', 'grande');--> statement-breakpoint
 CREATE TYPE "public"."sexo" AS ENUM('macho', 'femea');--> statement-breakpoint
+-- protetor_id é FK lógica → identity.protetores_ongs.id (cross-context).
+-- Sem REFERENCES por design (DDD: bounded contexts não devem ter FK físicas
+-- entre si). A integridade é responsabilidade da camada de serviço.
 CREATE TABLE "pets" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"protetor_id" uuid NOT NULL,

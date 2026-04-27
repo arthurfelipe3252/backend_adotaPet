@@ -26,7 +26,19 @@
       "Bash(npx drizzle-kit:*)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/api/v1/docs)",
       "Bash(node:*)",
-      "Bash(curl -s http://localhost:3000/api/v1/users/me)"
+      "Bash(curl -s http://localhost:3000/api/v1/users/me)",
+      "Bash(grep -E \"^\\\\.env$\")",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(echo \"TSC_EXIT=$?\")",
+      "Bash(echo \"BUILD_EXIT=$?\")",
+      "Bash(docker info *)",
+      "Bash(docker run *)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:postgres@localhost:5433/adotapet_test\" npx drizzle-kit migrate)",
+      "Bash(curl -sS -o /dev/null -w \"%{http_code}\" http://localhost:3005/api/v1/pets)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:postgres@localhost:5433/adotapet_test\" PORT=3005 JWT_SECRET=test-secret npm run start:prod)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:postgres@localhost:5433/adotapet_test\" PORT=3005 JWT_SECRET=test-secret node dist/src/main.js)",
+      "Bash(curl *)",
+      "Bash(powershell *)"
     ]
   }
 }

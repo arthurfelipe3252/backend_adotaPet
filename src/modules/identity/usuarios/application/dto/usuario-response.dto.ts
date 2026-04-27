@@ -5,6 +5,9 @@ import { Usuario } from '@identity/usuarios/domain/models/usuario.entity';
 /**
  * DTO de saída para qualquer endpoint que retorna um usuário.
  * IMPORTANTE: nunca expõe `senhaHash`. Sempre use `deUsuario()` para construir.
+ *
+ * `imagemBase64` NÃO está aqui: a foto de perfil pertence ao DTO da entidade
+ * filha (AdotanteResponseDto / ProtetorOngResponseDto).
  */
 export class UsuarioResponseDto {
   @ApiProperty({
@@ -21,9 +24,6 @@ export class UsuarioResponseDto {
 
   @ApiPropertyOptional({ example: '11987654321', nullable: true })
   telefone!: string | null;
-
-  @ApiPropertyOptional({ example: null, nullable: true })
-  imagemBase64!: string | null;
 
   @ApiProperty({ enum: TipoUsuario, example: TipoUsuario.Adotante })
   tipoUsuario!: TipoUsuario;
@@ -50,7 +50,6 @@ export class UsuarioResponseDto {
     dto.nome = usuario.nome;
     dto.email = usuario.email;
     dto.telefone = usuario.telefone ?? null;
-    dto.imagemBase64 = usuario.imagemBase64 ?? null;
     dto.tipoUsuario = usuario.tipoUsuario;
     dto.ativo = usuario.ativo;
     dto.createdAt = usuario.createdAt!;
