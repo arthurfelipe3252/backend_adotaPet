@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SharedModule } from '@shared/shared.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { IdentityModule } from '@identity/identity.module';
+import { AdoptionModule } from '@adoption/adoption.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { IdentityModule } from '@identity/identity.module';
     SharedModule,
     CatalogModule,
     IdentityModule,
+    AdoptionModule,
   ],
 })
 export class AppModule {}
