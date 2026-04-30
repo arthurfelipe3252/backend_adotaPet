@@ -38,7 +38,11 @@
       "Bash(DATABASE_URL=\"postgresql://postgres:postgres@localhost:5433/adotapet_test\" PORT=3005 JWT_SECRET=test-secret npm run start:prod)",
       "Bash(DATABASE_URL=\"postgresql://postgres:postgres@localhost:5433/adotapet_test\" PORT=3005 JWT_SECRET=test-secret node dist/src/main.js)",
       "Bash(curl *)",
-      "Bash(powershell *)"
+      "Bash(powershell *)",
+      "Bash(git -C \"C:\\\\E.S\\\\Quinto semestre\\\\projeto\\\\backend_adotaPet\" log --all --graph --oneline)",
+      "Bash(git -C \"C:\\\\E.S\\\\Quinto semestre\\\\projeto\\\\backend_adotaPet\" status)",
+      "Bash(git -C \"C:\\\\E.S\\\\Quinto semestre\\\\projeto\\\\backend_adotaPet\" show a57582b --stat)",
+      "Bash(git -C \"C:\\\\E.S\\\\Quinto semestre\\\\projeto\\\\backend_adotaPet\" show 80f9b88 --stat)"
     ]
   }
 }
