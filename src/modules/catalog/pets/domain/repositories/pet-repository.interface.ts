@@ -11,7 +11,7 @@ export interface PetFilters {
 }
 
 export interface PetRepository {
-  create(pet: Pet): Promise<void>;
+  create(pet: Pet): Promise<Pet>;
   update(pet: Pet): Promise<void>;
   delete(id: string): Promise<void>;
   findAll(filters?: PetFilters): Promise<Pet[]>;

@@ -17,6 +17,7 @@ export interface PetProps {
   descricao?: string | null;
   temperamento?: string | null;
   status: PetStatus;
+  fotosUrls?: string[] | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -35,6 +36,7 @@ export class Pet {
   private _descricao?: string | null;
   private _temperamento?: string | null;
   private _status: PetStatus;
+  private _fotosUrls?: string[] | null;
   private readonly _createdAt?: Date;
   private readonly _updatedAt?: Date;
 
@@ -57,6 +59,7 @@ export class Pet {
   get descricao(): string | null | undefined { return this._descricao; }
   get temperamento(): string | null | undefined { return this._temperamento; }
   get status(): PetStatus { return this._status; }
+  get fotosUrls(): string[] | null | undefined { return this._fotosUrls; }
   get createdAt(): Date | undefined { return this._createdAt; }
   get updatedAt(): Date | undefined { return this._updatedAt; }
 
@@ -71,6 +74,7 @@ export class Pet {
   withDescricao(descricao: string | null): this { this._descricao = descricao; return this; }
   withTemperamento(temperamento: string | null): this { this._temperamento = temperamento; return this; }
   withStatus(status: PetStatus): this { this._status = status; return this; }
+  withFotosUrls(fotosUrls: string[] | null): this { this._fotosUrls = fotosUrls; return this; }
 
   static restore(props?: PetProps | null): Pet | null {
     if (!props) return null;
@@ -87,6 +91,7 @@ export class Pet {
     entity._descricao = props.descricao;
     entity._temperamento = props.temperamento;
     entity._status = props.status;
+    entity._fotosUrls = props.fotosUrls;
     return entity;
   }
 

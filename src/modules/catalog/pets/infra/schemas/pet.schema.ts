@@ -35,6 +35,7 @@ export const petsSchema = pgTable("pets", {
   descricao: text("descricao"),
   temperamento: text("temperamento"),
   status: petStatusEnum("status").notNull().default("disponivel"),
+  fotosUrls: text("fotos_urls"), // JSON array de base64/URLs, ex: '["data:image/jpeg;base64,...","..."]'
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull(),
 });

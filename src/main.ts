@@ -8,6 +8,11 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+    app.enableCors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  });
+
   // Limite de body JSON elevado: cadastros de protetor/ONG enviam foto +
   // documento comprobatório em base64 inline. Cada um vai até ~5 MB de
   // arquivo binário (~7 MB em base64); 20 MB cobre o pior caso (foto +

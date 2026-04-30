@@ -10,9 +10,15 @@ import { petsSchema, PetRow } from "../schemas/pet.schema";
 
 @Injectable()
 export class DrizzlePetRepository implements PetRepository {
-  constructor(private readonly drizzle: DrizzleService) {}
+  constructor(private readonly drizzle: DrizzleService) { }
 
-  // ── Mapeamento row → entidade ──────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  /** Converte JSON string armazenada em array (ou [] se nulo/inválido) */
+  private parseFotosUrls(raw: string | null | undefined): string[] {
+    if (!raw) return [];
+    try { return JSON.parse(raw) as string[]; } catch { return []; }
+  }
 
   private toEntity(row: PetRow): Pet {
     return Pet.restore({
@@ -29,6 +35,7 @@ export class DrizzlePetRepository implements PetRepository {
       descricao: row.descricao,
       temperamento: row.temperamento,
       status: row.status,
+      fotosUrls: this.parseFotosUrls(row.fotosUrls),
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     })!;
@@ -36,25 +43,29 @@ export class DrizzlePetRepository implements PetRepository {
 
   // ── CRUD ───────────────────────────────────────────────────────────────────
 
-  async create(pet: Pet): Promise<void> {
-    // id é omitido propositalmente: quando o pet é novo, deixamos o
-    // defaultRandom() da coluna gerar o uuid no banco.
-    await this.drizzle.db.insert(petsSchema).values({
-      protetorId: pet.protetorId,
-      nome: pet.nome,
-      especie: pet.especie,
-      raca: pet.raca,
-      porte: pet.porte,
-      sexo: pet.sexo,
-      idadeMeses: pet.idadeMeses,
-      castrado: pet.castrado,
-      vacinado: pet.vacinado,
-      descricao: pet.descricao,
-      temperamento: pet.temperamento,
-      status: pet.status,
-      createdAt: pet.createdAt!,
-      updatedAt: pet.updatedAt!,
-    });
+  async create(pet: Pet): Promise<Pet> {
+    const [row] = await this.drizzle.db
+      .insert(petsSchema)
+      .values({
+        protetorId: pet.protetorId,
+        nome: pet.nome,
+        especie: pet.especie,
+        raca: pet.raca,
+        porte: pet.porte,
+        sexo: pet.sexo,
+        idadeMeses: pet.idadeMeses,
+        castrado: pet.castrado,
+        vacinado: pet.vacinado,
+        descricao: pet.descricao,
+        temperamento: pet.temperamento,
+        status: pet.status,
+        fotosUrls: pet.fotosUrls ? JSON.stringify(pet.fotosUrls) : null,
+        createdAt: pet.createdAt!,
+        updatedAt: pet.updatedAt!,
+      })
+      .returning();
+
+    return this.toEntity(row);
   }
 
   async update(pet: Pet): Promise<void> {
@@ -72,6 +83,7 @@ export class DrizzlePetRepository implements PetRepository {
         descricao: pet.descricao,
         temperamento: pet.temperamento,
         status: pet.status,
+        fotosUrls: pet.fotosUrls ? JSON.stringify(pet.fotosUrls) : null,
         updatedAt: new Date(),
       })
       .where(eq(petsSchema.id, pet.id!));
@@ -86,21 +98,11 @@ export class DrizzlePetRepository implements PetRepository {
   async findAll(filters?: PetFilters): Promise<Pet[]> {
     const conditions: SQL[] = [];
 
-    if (filters?.especie) {
-      conditions.push(eq(petsSchema.especie, filters.especie));
-    }
-    if (filters?.porte) {
-      conditions.push(eq(petsSchema.porte, filters.porte));
-    }
-    if (filters?.status) {
-      conditions.push(eq(petsSchema.status, filters.status));
-    }
-    if (filters?.castrado !== undefined) {
-      conditions.push(eq(petsSchema.castrado, filters.castrado));
-    }
-    if (filters?.protetorId) {
-      conditions.push(eq(petsSchema.protetorId, filters.protetorId));
-    }
+    if (filters?.especie) conditions.push(eq(petsSchema.especie, filters.especie));
+    if (filters?.porte) conditions.push(eq(petsSchema.porte, filters.porte));
+    if (filters?.status) conditions.push(eq(petsSchema.status, filters.status));
+    if (filters?.castrado !== undefined) conditions.push(eq(petsSchema.castrado, filters.castrado));
+    if (filters?.protetorId) conditions.push(eq(petsSchema.protetorId, filters.protetorId));
 
     const rows = await this.drizzle.db
       .select()

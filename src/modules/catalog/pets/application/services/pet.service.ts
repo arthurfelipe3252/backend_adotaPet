@@ -13,7 +13,7 @@ export class PetService {
   constructor(
     @Inject(PET_REPOSITORY)
     private readonly petRepository: PetRepository,
-  ) {}
+  ) { }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -32,6 +32,7 @@ export class PetService {
       descricao: pet.descricao ?? null,
       temperamento: pet.temperamento ?? null,
       status: pet.status,
+      fotosUrls: pet.fotosUrls ?? [],
       createdAt: pet.createdAt!,
       updatedAt: pet.updatedAt!,
     };
@@ -41,8 +42,8 @@ export class PetService {
 
   async create(dto: CreatePetDto): Promise<PetResponseDto> {
     const pet = Pet.create(dto);
-    await this.petRepository.create(pet);
-    return this.toResponse(pet);
+    const created = await this.petRepository.create(pet);
+    return this.toResponse(created);
   }
 
   async findAll(filters?: PetFilters): Promise<PetResponseDto[]> {
@@ -69,9 +70,9 @@ export class PetService {
     if (dto.castrado !== undefined) pet.withCastrado(dto.castrado);
     if (dto.vacinado !== undefined) pet.withVacinado(dto.vacinado);
     if (dto.descricao !== undefined) pet.withDescricao(dto.descricao ?? null);
-    if (dto.temperamento !== undefined)
-      pet.withTemperamento(dto.temperamento ?? null);
+    if (dto.temperamento !== undefined) pet.withTemperamento(dto.temperamento ?? null);
     if (dto.status !== undefined) pet.withStatus(dto.status);
+    if (dto.fotosUrls !== undefined) pet.withFotosUrls(dto.fotosUrls ?? null);
 
     await this.petRepository.update(pet);
     return this.toResponse(pet);
