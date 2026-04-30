@@ -8,6 +8,7 @@ import { enderecosSchema } from '@identity/enderecos/infra/schemas/enderecos.sch
 import { protetoresOngsSchema } from '@identity/protetores_ongs/infra/schemas/protetores-ongs.schema';
 import { refreshTokensSchema } from '@identity/usuarios/infra/schemas/refresh-tokens.schema';
 import { usuariosSchema } from '@identity/usuarios/infra/schemas/usuarios.schema';
+import { adoptionRequestsSchema } from '@adoption/adoption-requests/infra/schemas/adoption-requests.schema';
 
 const schema = {
   pets: petsSchema,
@@ -16,6 +17,7 @@ const schema = {
   enderecos: enderecosSchema,
   adotantes: adotantesSchema,
   protetoresOngs: protetoresOngsSchema,
+  adoptionRequests: adoptionRequestsSchema,
 };
 
 @Injectable()
