@@ -1,8 +1,11 @@
 import { Injectable, type OnModuleDestroy } from "@nestjs/common";
+import { adoptionRequestsSchema } from "@adoption/adoption-requests/infra/schemas/adoption-requests.schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-const schema = {};
+const schema = {
+  adoptionRequestsSchema,
+};
 
 @Injectable()
 export class DrizzleService implements OnModuleDestroy {
