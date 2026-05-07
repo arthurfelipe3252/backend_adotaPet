@@ -1,0 +1,46 @@
+name: Deploy
+
+# Estratégia: deploy só roda DEPOIS do CI ("Lint & Build") passar em main.
+# Se o CI falhar, nem chama o webhook do Easypanel (evita deployar build quebrado).
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  # Permite disparar manualmente pela UI do GitHub Actions.
+  workflow_dispatch:
+
+# Garante que só um deploy roda por vez. Se chegar um novo commit antes do
+# anterior terminar, o anterior é cancelado — sempre vence o último.
+concurrency:
+  group: deploy-easypanel
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Trigger Easypanel deploy hook
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    # Em workflow_run, só dispara se o CI fechou com sucesso. Em workflow_dispatch,
+    # conclusion é null — aí sempre roda.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Call Easypanel deploy hook
+        env:
+          HOOK_URL: ${{ secrets.EASYPANEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "::error::Secret EASYPANEL_DEPLOY_HOOK_URL não configurada."
+            exit 1
+          fi
+
+          # -fsS faz curl falhar (exit != 0) em HTTP >= 400, sem barulho em sucesso.
+          # --retry cobre blip de rede transitório no Easypanel.
+          curl --fail --silent --show-error \
+               --retry 3 --retry-delay 5 \
+               --max-time 30 \
+               -X POST "$HOOK_URL"
+
+          echo "Deploy hook chamado com sucesso."
