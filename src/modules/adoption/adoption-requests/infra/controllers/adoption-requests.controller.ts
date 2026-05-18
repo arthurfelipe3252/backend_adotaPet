@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { AdoptionRequestService } from "@adoption/adoption-requests/application/services/adoption-request.service";
 import {
-  type CreateAdoptionRequestDto,
-  type UpdateAdoptionRequestStatusDto,
+  CreateAdoptionRequestDto,
+  UpdateAdoptionRequestStatusDto,
 } from "@adoption/adoption-requests/application/dto/adoption-request.dto";
 
 @Controller("adoptions")

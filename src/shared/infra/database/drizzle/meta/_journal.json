@@ -43,6 +43,13 @@
       "when": 1777586367720,
       "tag": "0005_fotos_urls_pets",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779109378667,
+      "tag": "0006_curious_vivisector",
+      "breakpoints": true
     }
   ]
 }

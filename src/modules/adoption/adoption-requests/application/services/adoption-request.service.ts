@@ -22,10 +22,11 @@ export class AdoptionRequestService {
   async create(dto: CreateAdoptionRequestDto): Promise<AdoptionRequest> {
     const request = AdoptionRequest.create({
       petId: dto.petId,
+      protetorId: dto.protetorId ?? null,
       adopterId: dto.adopterId,
-      notes: dto.notes,
+      notes: dto.mensagem ?? null,
       matchScore: dto.matchScore ?? null,
-      matchAnswers: dto.matchAnswers ?? null,
+      matchAnswers: this.resolveMatchAnswers(dto),
       preTriageStatus: this.resolvePreTriageStatus(dto),
       status: "received",
     });
@@ -65,5 +66,20 @@ export class AdoptionRequestService {
     }
 
     return "review";
+  }
+
+  private resolveMatchAnswers(
+    dto: CreateAdoptionRequestDto,
+  ): Record<string, string | number | boolean | null> | null {
+    if (dto.matchAnswers) return dto.matchAnswers;
+    if (!dto.questionario) return null;
+
+    return {
+      tipoMoradia: dto.questionario.tipoMoradia,
+      horasDisponiveisDia: dto.questionario.horasDisponiveisDia,
+      temExperiencia: dto.questionario.temExperiencia,
+      temCriancas: dto.questionario.temCriancas,
+      temOutrosPets: dto.questionario.temOutrosPets,
+    };
   }
 }
