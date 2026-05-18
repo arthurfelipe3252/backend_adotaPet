@@ -21,7 +21,8 @@ describe('AppController (e2e)', () => {
       .get('/health')
       .expect(200)
       .expect((res) => {
-        if (res.body?.status !== 'ok') {
+        const body = res.body as { status?: string };
+        if (body.status !== 'ok') {
           throw new Error('Health check did not return status=ok');
         }
       });
