@@ -5,6 +5,7 @@ export type AdoptionPreTriageStatus = "qualified" | "review" | "disqualified";
 export interface AdoptionRequestProps {
   id?: string;
   petId: string;
+  protetorId?: string | null;
   adopterId: string;
   status: AdoptionRequestStatus;
   preTriageStatus: AdoptionPreTriageStatus;
@@ -18,6 +19,7 @@ export interface AdoptionRequestProps {
 export class AdoptionRequest {
   private readonly _id?: string;
   private _petId: string;
+  private _protetorId?: string | null;
   private _adopterId: string;
   private _status: AdoptionRequestStatus;
   private _preTriageStatus: AdoptionPreTriageStatus;
@@ -39,6 +41,10 @@ export class AdoptionRequest {
 
   get petId(): string {
     return this._petId;
+  }
+
+  get protetorId(): string | null | undefined {
+    return this._protetorId;
   }
 
   get adopterId(): string {
@@ -93,6 +99,11 @@ export class AdoptionRequest {
     return this;
   }
 
+  withProtetorId(protetorId?: string | null) {
+    this._protetorId = protetorId ?? null;
+    return this;
+  }
+
   withNotes(notes?: string | null) {
     this._notes = notes;
     return this;
@@ -115,6 +126,7 @@ export class AdoptionRequest {
     const now = new Date();
     const entity = new AdoptionRequest(undefined, now, now);
     entity._petId = props.petId;
+    entity._protetorId = props.protetorId ?? null;
     entity._adopterId = props.adopterId;
     entity._status = props.status ?? "received";
     entity._preTriageStatus = props.preTriageStatus ?? "review";
@@ -128,6 +140,7 @@ export class AdoptionRequest {
     if (!props) return null;
     const entity = new AdoptionRequest(props.id, props.createdAt, props.updatedAt);
     entity._petId = props.petId;
+    entity._protetorId = props.protetorId ?? null;
     entity._adopterId = props.adopterId;
     entity._status = props.status;
     entity._preTriageStatus = props.preTriageStatus;

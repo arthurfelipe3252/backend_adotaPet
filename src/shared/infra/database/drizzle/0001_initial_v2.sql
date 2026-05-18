@@ -9,9 +9,21 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- -----------------------------------------------------
 -- Enums
 -- -----------------------------------------------------
-CREATE TYPE tipo_usuario       AS ENUM ('adotante', 'protetor', 'ong');
-CREATE TYPE tipo_moradia       AS ENUM ('casa_quintal', 'apartamento', 'casa_sem_quintal');
-CREATE TYPE disponibilidade    AS ENUM ('alta', 'media', 'baixa');
+DO $$ BEGIN
+  CREATE TYPE tipo_usuario       AS ENUM ('adotante', 'protetor', 'ong');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE tipo_moradia       AS ENUM ('casa_quintal', 'apartamento', 'casa_sem_quintal');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE disponibilidade    AS ENUM ('alta', 'media', 'baixa');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 -- =====================================================
 -- BOUNDED CONTEXT: identity (users)
