@@ -5,6 +5,7 @@ import { HealthController } from '@shared/infra/http/health/health.controller';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { IdentityModule } from '@identity/identity.module';
 import { AdoptionModule } from '@adoption/adoption.module';
+import { ChatModule } from '@chat/chat.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AdoptionModule } from '@adoption/adoption.module';
     CatalogModule,
     IdentityModule,
     AdoptionModule,
+    ChatModule,
   ],
   controllers: [HealthController],
 })

@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-  varchar,
-} from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 import { enderecosSchema } from '@identity/enderecos/infra/schemas/enderecos.schema';
 import { usuariosSchema } from '@identity/usuarios/infra/schemas/usuarios.schema';
 

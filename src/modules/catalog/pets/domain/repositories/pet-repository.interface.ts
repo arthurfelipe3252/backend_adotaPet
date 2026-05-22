@@ -1,6 +1,6 @@
-import { Pet, Especie, Porte, PetStatus } from "../models/pet.entity";
+import { Pet, Especie, Porte, PetStatus } from '../models/pet.entity';
 
-export const PET_REPOSITORY = Symbol("PET_REPOSITORY");
+export const PET_REPOSITORY = Symbol('PET_REPOSITORY');
 
 export interface PetFilters {
   especie?: Especie;

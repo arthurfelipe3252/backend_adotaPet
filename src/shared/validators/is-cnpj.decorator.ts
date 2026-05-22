@@ -23,7 +23,9 @@ class IsCnpjConstraint implements ValidatorConstraintInterface {
   }
 }
 
-export function IsCNPJ(validationOptions?: ValidationOptions): PropertyDecorator {
+export function IsCNPJ(
+  validationOptions?: ValidationOptions,
+): PropertyDecorator {
   return (object: object, propertyName: string | symbol): void => {
     registerDecorator({
       target: object.constructor,

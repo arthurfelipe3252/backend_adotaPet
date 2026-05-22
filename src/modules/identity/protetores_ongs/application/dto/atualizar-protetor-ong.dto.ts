@@ -67,8 +67,7 @@ export class AtualizarProtetorOngDto {
   @IsOptional()
   @IsString()
   @Matches(/^\d{10,11}$/, {
-    message:
-      'telefoneContato deve conter apenas dígitos (10 ou 11 caracteres)',
+    message: 'telefoneContato deve conter apenas dígitos (10 ou 11 caracteres)',
   })
   telefoneContato?: string;
 

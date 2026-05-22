@@ -53,8 +53,7 @@ export class AdotanteService {
 
   async criar(dto: CriarAdotanteDto): Promise<AdotanteResponseDto> {
     // ── Pré-checagens fora da transação (não segurar lock à toa) ────────
-    const emailJaUsado =
-      await this.usuarioRepository.buscarPorEmail(dto.email);
+    const emailJaUsado = await this.usuarioRepository.buscarPorEmail(dto.email);
     if (emailJaUsado) {
       throw new ConflictException('Email já cadastrado');
     }
@@ -178,7 +177,8 @@ export class AdotanteService {
       throw new NotFoundException('Perfil de adotante não encontrado');
     }
 
-    const usuarioAtual = await this.usuarioRepository.buscarPorId(autenticadoId);
+    const usuarioAtual =
+      await this.usuarioRepository.buscarPorId(autenticadoId);
     if (!usuarioAtual) {
       throw new NotFoundException('Usuário não encontrado');
     }

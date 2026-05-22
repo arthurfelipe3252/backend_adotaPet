@@ -1,7 +1,7 @@
-export type Especie = "cao" | "gato" | "outro";
-export type Porte = "pequeno" | "medio" | "grande";
-export type Sexo = "macho" | "femea";
-export type PetStatus = "disponivel" | "em_processo" | "adotado";
+export type Especie = 'cao' | 'gato' | 'outro';
+export type Porte = 'pequeno' | 'medio' | 'grande';
+export type Sexo = 'macho' | 'femea';
+export type PetStatus = 'disponivel' | 'em_processo' | 'adotado';
 
 export interface PetProps {
   id?: string;
@@ -46,35 +46,103 @@ export class Pet {
     this._updatedAt = updatedAt;
   }
 
-  get id(): string | undefined { return this._id; }
-  get protetorId(): string { return this._protetorId; }
-  get nome(): string { return this._nome; }
-  get especie(): Especie { return this._especie; }
-  get raca(): string | null | undefined { return this._raca; }
-  get porte(): Porte { return this._porte; }
-  get sexo(): Sexo { return this._sexo; }
-  get idadeMeses(): number { return this._idadeMeses; }
-  get castrado(): boolean { return this._castrado; }
-  get vacinado(): boolean { return this._vacinado; }
-  get descricao(): string | null | undefined { return this._descricao; }
-  get temperamento(): string | null | undefined { return this._temperamento; }
-  get status(): PetStatus { return this._status; }
-  get fotosUrls(): string[] | null | undefined { return this._fotosUrls; }
-  get createdAt(): Date | undefined { return this._createdAt; }
-  get updatedAt(): Date | undefined { return this._updatedAt; }
+  get id(): string | undefined {
+    return this._id;
+  }
+  get protetorId(): string {
+    return this._protetorId;
+  }
+  get nome(): string {
+    return this._nome;
+  }
+  get especie(): Especie {
+    return this._especie;
+  }
+  get raca(): string | null | undefined {
+    return this._raca;
+  }
+  get porte(): Porte {
+    return this._porte;
+  }
+  get sexo(): Sexo {
+    return this._sexo;
+  }
+  get idadeMeses(): number {
+    return this._idadeMeses;
+  }
+  get castrado(): boolean {
+    return this._castrado;
+  }
+  get vacinado(): boolean {
+    return this._vacinado;
+  }
+  get descricao(): string | null | undefined {
+    return this._descricao;
+  }
+  get temperamento(): string | null | undefined {
+    return this._temperamento;
+  }
+  get status(): PetStatus {
+    return this._status;
+  }
+  get fotosUrls(): string[] | null | undefined {
+    return this._fotosUrls;
+  }
+  get createdAt(): Date | undefined {
+    return this._createdAt;
+  }
+  get updatedAt(): Date | undefined {
+    return this._updatedAt;
+  }
 
-  withNome(nome: string): this { this._nome = nome; return this; }
-  withEspecie(especie: Especie): this { this._especie = especie; return this; }
-  withRaca(raca: string | null): this { this._raca = raca; return this; }
-  withPorte(porte: Porte): this { this._porte = porte; return this; }
-  withSexo(sexo: Sexo): this { this._sexo = sexo; return this; }
-  withIdadeMeses(idadeMeses: number): this { this._idadeMeses = idadeMeses; return this; }
-  withCastrado(castrado: boolean): this { this._castrado = castrado; return this; }
-  withVacinado(vacinado: boolean): this { this._vacinado = vacinado; return this; }
-  withDescricao(descricao: string | null): this { this._descricao = descricao; return this; }
-  withTemperamento(temperamento: string | null): this { this._temperamento = temperamento; return this; }
-  withStatus(status: PetStatus): this { this._status = status; return this; }
-  withFotosUrls(fotosUrls: string[] | null): this { this._fotosUrls = fotosUrls; return this; }
+  withNome(nome: string): this {
+    this._nome = nome;
+    return this;
+  }
+  withEspecie(especie: Especie): this {
+    this._especie = especie;
+    return this;
+  }
+  withRaca(raca: string | null): this {
+    this._raca = raca;
+    return this;
+  }
+  withPorte(porte: Porte): this {
+    this._porte = porte;
+    return this;
+  }
+  withSexo(sexo: Sexo): this {
+    this._sexo = sexo;
+    return this;
+  }
+  withIdadeMeses(idadeMeses: number): this {
+    this._idadeMeses = idadeMeses;
+    return this;
+  }
+  withCastrado(castrado: boolean): this {
+    this._castrado = castrado;
+    return this;
+  }
+  withVacinado(vacinado: boolean): this {
+    this._vacinado = vacinado;
+    return this;
+  }
+  withDescricao(descricao: string | null): this {
+    this._descricao = descricao;
+    return this;
+  }
+  withTemperamento(temperamento: string | null): this {
+    this._temperamento = temperamento;
+    return this;
+  }
+  withStatus(status: PetStatus): this {
+    this._status = status;
+    return this;
+  }
+  withFotosUrls(fotosUrls: string[] | null): this {
+    this._fotosUrls = fotosUrls;
+    return this;
+  }
 
   static restore(props?: PetProps | null): Pet | null {
     if (!props) return null;
@@ -95,11 +163,13 @@ export class Pet {
     return entity;
   }
 
-  static create(props: Omit<PetProps, "id" | "createdAt" | "updatedAt" | "status">): Pet {
+  static create(
+    props: Omit<PetProps, 'id' | 'createdAt' | 'updatedAt' | 'status'>,
+  ): Pet {
     const now = new Date();
     return Pet.restore({
       ...props,
-      status: "disponivel",
+      status: 'disponivel',
       createdAt: now,
       updatedAt: now,
     })!;
