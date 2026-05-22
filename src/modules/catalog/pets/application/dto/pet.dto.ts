@@ -1,4 +1,9 @@
-import type { Especie, Porte, Sexo, PetStatus } from "../../domain/models/pet.entity";
+import type {
+  Especie,
+  Porte,
+  Sexo,
+  PetStatus,
+} from '../../domain/models/pet.entity';
 
 export interface CreatePetDto {
   protetorId: string;
@@ -15,7 +20,9 @@ export interface CreatePetDto {
   fotosUrls?: string[] | null;
 }
 
-export interface UpdatePetDto extends Partial<Omit<CreatePetDto, "protetorId">> {
+export interface UpdatePetDto extends Partial<
+  Omit<CreatePetDto, 'protetorId'>
+> {
   status?: PetStatus;
   fotosUrls?: string[] | null;
 }

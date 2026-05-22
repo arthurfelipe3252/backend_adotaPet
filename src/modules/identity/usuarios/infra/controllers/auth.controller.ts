@@ -122,7 +122,9 @@ export class AuthController {
     status: 401,
     description: 'Token de acesso ausente ou inválido',
   })
-  async logoutAll(@CurrentUser() autenticado: AuthenticatedUser): Promise<void> {
+  async logoutAll(
+    @CurrentUser() autenticado: AuthenticatedUser,
+  ): Promise<void> {
     await this.authService.logoutAll(autenticado.id);
   }
 

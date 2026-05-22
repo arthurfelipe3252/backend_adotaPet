@@ -28,7 +28,9 @@ class IsCpfConstraint implements ValidatorConstraintInterface {
  * cpf-cnpj-validator. Rejeita sequências repetidas (00000000000) e
  * combinações com DV errado.
  */
-export function IsCPF(validationOptions?: ValidationOptions): PropertyDecorator {
+export function IsCPF(
+  validationOptions?: ValidationOptions,
+): PropertyDecorator {
   return (object: object, propertyName: string | symbol): void => {
     registerDecorator({
       target: object.constructor,

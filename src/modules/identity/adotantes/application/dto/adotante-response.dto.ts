@@ -1,7 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  EnderecoResponseDto,
-} from '@identity/enderecos/application/dto/endereco.dto';
+import { EnderecoResponseDto } from '@identity/enderecos/application/dto/endereco.dto';
 import { Endereco } from '@identity/enderecos/domain/models/endereco.entity';
 import { Adotante } from '@identity/adotantes/domain/models/adotante.entity';
 import { UsuarioResponseDto } from '@identity/usuarios/application/dto/usuario-response.dto';

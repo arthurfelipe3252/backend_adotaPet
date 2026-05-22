@@ -1,11 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
-import { AdoptionRequestService } from "@adoption/adoption-requests/application/services/adoption-request.service";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { AdoptionRequestService } from '@adoption/adoption-requests/application/services/adoption-request.service';
 import {
   CreateAdoptionRequestDto,
   UpdateAdoptionRequestStatusDto,
-} from "@adoption/adoption-requests/application/dto/adoption-request.dto";
+} from '@adoption/adoption-requests/application/dto/adoption-request.dto';
 
-@Controller("adoptions")
+@Controller('adoptions')
 export class AdoptionRequestsController {
   constructor(private readonly service: AdoptionRequestService) {}
 
@@ -19,21 +27,21 @@ export class AdoptionRequestsController {
     return this.service.findAll();
   }
 
-  @Get(":id")
-  async findById(@Param("id") id: string) {
+  @Get(':id')
+  async findById(@Param('id') id: string) {
     return this.service.findById(id);
   }
 
-  @Patch(":id/status")
+  @Patch(':id/status')
   async updateStatus(
-    @Param("id") id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateAdoptionRequestStatusDto,
   ) {
     return this.service.updateStatus(id, dto);
   }
 
-  @Delete(":id")
-  async delete(@Param("id") id: string) {
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
     await this.service.delete(id);
     return { ok: true };
   }

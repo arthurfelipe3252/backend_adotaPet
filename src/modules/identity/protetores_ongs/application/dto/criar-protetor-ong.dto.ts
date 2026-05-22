@@ -29,7 +29,11 @@ export type TipoProtetorOng = 'protetor' | 'ong';
  * Validação de CPF/CNPJ é condicional ao `tipoUsuario` enviado.
  */
 export class CriarProtetorOngDto {
-  @ApiProperty({ example: 'ONG Patinhas Felizes', minLength: 2, maxLength: 150 })
+  @ApiProperty({
+    example: 'ONG Patinhas Felizes',
+    minLength: 2,
+    maxLength: 150,
+  })
   @IsString()
   @MinLength(2)
   @MaxLength(150)
@@ -131,7 +135,8 @@ export class CriarProtetorOngDto {
 
   @ApiProperty({
     type: EnderecoDto,
-    description: 'Endereço da organização ou do protetor. Obrigatório no cadastro.',
+    description:
+      'Endereço da organização ou do protetor. Obrigatório no cadastro.',
   })
   @IsObject({ message: 'endereco deve ser um objeto' })
   @IsNotEmptyObject(undefined, { message: 'endereco é obrigatório' })
