@@ -20,7 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
+    "db:migrate": "ts-node ./scripts/migrate.ts",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
   },
@@ -83,6 +83,18 @@
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "^@shared/(.*)$": "<rootDir>/shared/$1",
+      "^@identity/(.*)$": "<rootDir>/modules/identity/$1",
+      "^@catalog/(.*)$": "<rootDir>/modules/catalog/$1",
+      "^@match/(.*)$": "<rootDir>/modules/match/$1",
+      "^@adoption/(.*)$": "<rootDir>/modules/adoption/$1",
+      "^@chat/(.*)$": "<rootDir>/modules/chat/$1",
+      "^@timeline/(.*)$": "<rootDir>/modules/timeline/$1",
+      "^@geo/(.*)$": "<rootDir>/modules/geo/$1",
+      "^@notifications/(.*)$": "<rootDir>/modules/notifications/$1",
+      "^@payments/(.*)$": "<rootDir>/modules/payments/$1"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"

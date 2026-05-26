@@ -1,16 +1,16 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable } from '@nestjs/common';
 import {
   ADOPTION_REQUEST_REPOSITORY,
   type AdoptionRequestRepository,
-} from "@adoption/adoption-requests/domain/repositories/adoption-request-repository.interface";
+} from '@adoption/adoption-requests/domain/repositories/adoption-request-repository.interface';
 import {
   AdoptionPreTriageStatus,
   AdoptionRequest,
-} from "@adoption/adoption-requests/domain/models/adoption-request.entity";
+} from '@adoption/adoption-requests/domain/models/adoption-request.entity';
 import {
   type CreateAdoptionRequestDto,
   type UpdateAdoptionRequestStatusDto,
-} from "@adoption/adoption-requests/application/dto/adoption-request.dto";
+} from '@adoption/adoption-requests/application/dto/adoption-request.dto';
 
 @Injectable()
 export class AdoptionRequestService {
@@ -22,12 +22,13 @@ export class AdoptionRequestService {
   async create(dto: CreateAdoptionRequestDto): Promise<AdoptionRequest> {
     const request = AdoptionRequest.create({
       petId: dto.petId,
+      protetorId: dto.protetorId ?? null,
       adopterId: dto.adopterId,
-      notes: dto.notes,
+      notes: dto.mensagem ?? null,
       matchScore: dto.matchScore ?? null,
-      matchAnswers: dto.matchAnswers ?? null,
+      matchAnswers: this.resolveMatchAnswers(dto),
       preTriageStatus: this.resolvePreTriageStatus(dto),
-      status: "received",
+      status: 'received',
     });
 
     await this.repository.create(request);
@@ -58,12 +59,29 @@ export class AdoptionRequestService {
     await this.repository.delete(id);
   }
 
-  private resolvePreTriageStatus(dto: CreateAdoptionRequestDto): AdoptionPreTriageStatus {
+  private resolvePreTriageStatus(
+    dto: CreateAdoptionRequestDto,
+  ): AdoptionPreTriageStatus {
     if (dto.preTriageStatus) return dto.preTriageStatus;
-    if (typeof dto.matchScore === "number") {
-      return dto.matchScore >= 70 ? "qualified" : "disqualified";
+    if (typeof dto.matchScore === 'number') {
+      return dto.matchScore >= 70 ? 'qualified' : 'disqualified';
     }
 
-    return "review";
+    return 'review';
+  }
+
+  private resolveMatchAnswers(
+    dto: CreateAdoptionRequestDto,
+  ): Record<string, string | number | boolean | null> | null {
+    if (dto.matchAnswers) return dto.matchAnswers;
+    if (!dto.questionario) return null;
+
+    return {
+      tipoMoradia: dto.questionario.tipoMoradia,
+      horasDisponiveisDia: dto.questionario.horasDisponiveisDia,
+      temExperiencia: dto.questionario.temExperiencia,
+      temCriancas: dto.questionario.temCriancas,
+      temOutrosPets: dto.questionario.temOutrosPets,
+    };
   }
 }

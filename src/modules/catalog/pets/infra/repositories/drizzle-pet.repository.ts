@@ -1,23 +1,27 @@
-import { Injectable } from "@nestjs/common";
-import { eq, and, SQL } from "drizzle-orm";
-import { DrizzleService } from "@shared/infra/database/drizzle.service";
-import { Pet } from "../../domain/models/pet.entity";
+import { Injectable } from '@nestjs/common';
+import { eq, and, SQL } from 'drizzle-orm';
+import { DrizzleService } from '@shared/infra/database/drizzle.service';
+import { Pet } from '../../domain/models/pet.entity';
 import {
   PetRepository,
   PetFilters,
-} from "../../domain/repositories/pet-repository.interface";
-import { petsSchema, PetRow } from "../schemas/pet.schema";
+} from '../../domain/repositories/pet-repository.interface';
+import { petsSchema, PetRow } from '../schemas/pet.schema';
 
 @Injectable()
 export class DrizzlePetRepository implements PetRepository {
-  constructor(private readonly drizzle: DrizzleService) { }
+  constructor(private readonly drizzle: DrizzleService) {}
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   /** Converte JSON string armazenada em array (ou [] se nulo/inválido) */
   private parseFotosUrls(raw: string | null | undefined): string[] {
     if (!raw) return [];
-    try { return JSON.parse(raw) as string[]; } catch { return []; }
+    try {
+      return JSON.parse(raw) as string[];
+    } catch {
+      return [];
+    }
   }
 
   private toEntity(row: PetRow): Pet {
@@ -90,19 +94,20 @@ export class DrizzlePetRepository implements PetRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.drizzle.db
-      .delete(petsSchema)
-      .where(eq(petsSchema.id, id));
+    await this.drizzle.db.delete(petsSchema).where(eq(petsSchema.id, id));
   }
 
   async findAll(filters?: PetFilters): Promise<Pet[]> {
     const conditions: SQL[] = [];
 
-    if (filters?.especie) conditions.push(eq(petsSchema.especie, filters.especie));
+    if (filters?.especie)
+      conditions.push(eq(petsSchema.especie, filters.especie));
     if (filters?.porte) conditions.push(eq(petsSchema.porte, filters.porte));
     if (filters?.status) conditions.push(eq(petsSchema.status, filters.status));
-    if (filters?.castrado !== undefined) conditions.push(eq(petsSchema.castrado, filters.castrado));
-    if (filters?.protetorId) conditions.push(eq(petsSchema.protetorId, filters.protetorId));
+    if (filters?.castrado !== undefined)
+      conditions.push(eq(petsSchema.castrado, filters.castrado));
+    if (filters?.protetorId)
+      conditions.push(eq(petsSchema.protetorId, filters.protetorId));
 
     const rows = await this.drizzle.db
       .select()

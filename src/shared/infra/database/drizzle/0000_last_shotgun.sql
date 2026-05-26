@@ -1,7 +1,23 @@
-CREATE TYPE "public"."especie" AS ENUM('cao', 'gato', 'outro');--> statement-breakpoint
-CREATE TYPE "public"."pet_status" AS ENUM('disponivel', 'em_processo', 'adotado');--> statement-breakpoint
-CREATE TYPE "public"."porte" AS ENUM('pequeno', 'medio', 'grande');--> statement-breakpoint
-CREATE TYPE "public"."sexo" AS ENUM('macho', 'femea');--> statement-breakpoint
+DO $$ BEGIN
+	CREATE TYPE "public"."especie" AS ENUM('cao', 'gato', 'outro');
+EXCEPTION
+	WHEN duplicate_object THEN null;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+	CREATE TYPE "public"."pet_status" AS ENUM('disponivel', 'em_processo', 'adotado');
+EXCEPTION
+	WHEN duplicate_object THEN null;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+	CREATE TYPE "public"."porte" AS ENUM('pequeno', 'medio', 'grande');
+EXCEPTION
+	WHEN duplicate_object THEN null;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+	CREATE TYPE "public"."sexo" AS ENUM('macho', 'femea');
+EXCEPTION
+	WHEN duplicate_object THEN null;
+END $$;--> statement-breakpoint
 -- protetor_id é FK lógica → identity.protetores_ongs.id (cross-context).
 -- Sem REFERENCES por design (DDD: bounded contexts não devem ter FK físicas
 -- entre si). A integridade é responsabilidade da camada de serviço.

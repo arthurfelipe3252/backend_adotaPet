@@ -8,10 +8,7 @@ export interface ProtetorOngRepository {
    * Insere um novo protetor/ONG e retorna a entidade com id gerado.
    * Lança ConflictException se cpfCnpj ou usuario_id já existirem.
    */
-  criar(
-    protetor: ProtetorOng,
-    executor?: DbExecutor,
-  ): Promise<ProtetorOng>;
+  criar(protetor: ProtetorOng, executor?: DbExecutor): Promise<ProtetorOng>;
 
   buscarPorCpfCnpj(cpfCnpj: string): Promise<ProtetorOng | null>;
 
@@ -22,8 +19,5 @@ export interface ProtetorOngRepository {
    * documento comprobatório, vínculo de endereço) e seta updated_at = now.
    * NÃO permite alterar cpfCnpj nem usuario_id (identidade).
    */
-  atualizar(
-    protetor: ProtetorOng,
-    executor?: DbExecutor,
-  ): Promise<ProtetorOng>;
+  atualizar(protetor: ProtetorOng, executor?: DbExecutor): Promise<ProtetorOng>;
 }

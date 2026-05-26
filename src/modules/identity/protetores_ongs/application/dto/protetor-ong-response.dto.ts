@@ -1,7 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  EnderecoResponseDto,
-} from '@identity/enderecos/application/dto/endereco.dto';
+import { EnderecoResponseDto } from '@identity/enderecos/application/dto/endereco.dto';
 import { Endereco } from '@identity/enderecos/domain/models/endereco.entity';
 import { ProtetorOng } from '@identity/protetores_ongs/domain/models/protetor-ong.entity';
 import { UsuarioResponseDto } from '@identity/usuarios/application/dto/usuario-response.dto';
@@ -26,7 +24,10 @@ export class ProtetorOngResponseDto {
   @ApiPropertyOptional({ nullable: true })
   telefoneContato!: string | null;
 
-  @ApiPropertyOptional({ nullable: true, description: 'Foto de perfil em base64' })
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'Foto de perfil em base64',
+  })
   imagemBase64!: string | null;
 
   @ApiProperty({

@@ -9,10 +9,21 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- -----------------------------------------------------
 -- Enums
 -- -----------------------------------------------------
-CREATE TYPE tipo_usuario       AS ENUM ('adotante', 'protetor', 'ong');
-CREATE TYPE tipo_moradia       AS ENUM ('casa_quintal', 'apartamento', 'casa_sem_quintal');
-CREATE TYPE disponibilidade    AS ENUM ('alta', 'media', 'baixa');
-CREATE TYPE status_solicitacao AS ENUM ('pendente', 'em_analise', 'aprovada', 'recusada', 'concluida');
+DO $$ BEGIN
+  CREATE TYPE tipo_usuario       AS ENUM ('adotante', 'protetor', 'ong');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE tipo_moradia       AS ENUM ('casa_quintal', 'apartamento', 'casa_sem_quintal');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE disponibilidade    AS ENUM ('alta', 'media', 'baixa');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 -- =====================================================
 -- BOUNDED CONTEXT: identity (users)
@@ -165,27 +176,9 @@ CREATE TABLE IF NOT EXISTS questionarios_match (
 -- =====================================================
 -- BOUNDED CONTEXT: adoption
 -- =====================================================
-
--- -----------------------------------------------------
--- Table solicitacoes_adocao
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS solicitacoes_adocao (
-  id          uuid                      NOT NULL DEFAULT gen_random_uuid(),
-  pet_id      uuid                      NOT NULL, -- FK lógica → catalog.pets.id
-  adotante_id uuid                      NOT NULL, -- FK lógica → identity.adotantes.id
-  protetor_id uuid                      NOT NULL, -- FK lógica → identity.protetores_ongs.id
-  status      status_solicitacao        NOT NULL DEFAULT 'pendente',
-  motivacao   text,
-  score_match numeric(5,2),
-  created_at  timestamp with time zone  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at  timestamp with time zone  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT pk_solicitacoes_adocao PRIMARY KEY (id)
-);
-
-CREATE INDEX idx_solicitacoes_pet      ON solicitacoes_adocao (pet_id);
-CREATE INDEX idx_solicitacoes_adotante ON solicitacoes_adocao (adotante_id);
-CREATE INDEX idx_solicitacoes_protetor ON solicitacoes_adocao (protetor_id);
-CREATE INDEX idx_solicitacoes_status   ON solicitacoes_adocao (status);
+-- A tabela `adoption_requests` é criada na migration 0003_volatile_garia.sql.
+-- A tabela `solicitacoes_adocao` (português) foi removida — o time substituiu
+-- pela modelagem em inglês durante a feature de adoção.
 
 -- =====================================================
 -- BOUNDED CONTEXT: chat
@@ -196,7 +189,7 @@ CREATE INDEX idx_solicitacoes_status   ON solicitacoes_adocao (status);
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS mensagens_chat (
   id             uuid                      NOT NULL DEFAULT gen_random_uuid(),
-  solicitacao_id uuid                      NOT NULL, -- FK lógica → adoption.solicitacoes_adocao.id
+  solicitacao_id uuid                      NOT NULL, -- FK lógica → adoption.adoption_requests.id
   remetente_id   uuid                      NOT NULL, -- FK lógica → identity.usuarios.id
   conteudo       text                      NOT NULL,
   lida           boolean                   NOT NULL DEFAULT false,

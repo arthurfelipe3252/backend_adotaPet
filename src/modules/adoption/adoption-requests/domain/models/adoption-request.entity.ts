@@ -1,10 +1,15 @@
-export type AdoptionRequestStatus = "received" | "in_analysis" | "approved" | "rejected";
+export type AdoptionRequestStatus =
+  | 'received'
+  | 'in_analysis'
+  | 'approved'
+  | 'rejected';
 
-export type AdoptionPreTriageStatus = "qualified" | "review" | "disqualified";
+export type AdoptionPreTriageStatus = 'qualified' | 'review' | 'disqualified';
 
 export interface AdoptionRequestProps {
   id?: string;
   petId: string;
+  protetorId?: string | null;
   adopterId: string;
   status: AdoptionRequestStatus;
   preTriageStatus: AdoptionPreTriageStatus;
@@ -18,11 +23,15 @@ export interface AdoptionRequestProps {
 export class AdoptionRequest {
   private readonly _id?: string;
   private _petId: string;
+  private _protetorId?: string | null;
   private _adopterId: string;
   private _status: AdoptionRequestStatus;
   private _preTriageStatus: AdoptionPreTriageStatus;
   private _matchScore?: number | null;
-  private _matchAnswers?: Record<string, string | number | boolean | null> | null;
+  private _matchAnswers?: Record<
+    string,
+    string | number | boolean | null
+  > | null;
   private _notes?: string | null;
   private readonly _createdAt?: Date;
   private _updatedAt?: Date;
@@ -41,6 +50,10 @@ export class AdoptionRequest {
     return this._petId;
   }
 
+  get protetorId(): string | null | undefined {
+    return this._protetorId;
+  }
+
   get adopterId(): string {
     return this._adopterId;
   }
@@ -57,7 +70,10 @@ export class AdoptionRequest {
     return this._matchScore;
   }
 
-  get matchAnswers(): Record<string, string | number | boolean | null> | null | undefined {
+  get matchAnswers():
+    | Record<string, string | number | boolean | null>
+    | null
+    | undefined {
     return this._matchAnswers;
   }
 
@@ -88,8 +104,15 @@ export class AdoptionRequest {
     return this;
   }
 
-  withMatchAnswers(answers?: Record<string, string | number | boolean | null> | null) {
+  withMatchAnswers(
+    answers?: Record<string, string | number | boolean | null> | null,
+  ) {
     this._matchAnswers = answers ?? null;
+    return this;
+  }
+
+  withProtetorId(protetorId?: string | null) {
+    this._protetorId = protetorId ?? null;
     return this;
   }
 
@@ -106,7 +129,7 @@ export class AdoptionRequest {
   static create(
     props: Omit<
       AdoptionRequestProps,
-      "id" | "createdAt" | "updatedAt" | "status" | "preTriageStatus"
+      'id' | 'createdAt' | 'updatedAt' | 'status' | 'preTriageStatus'
     > & {
       status?: AdoptionRequestStatus;
       preTriageStatus?: AdoptionPreTriageStatus;
@@ -115,9 +138,10 @@ export class AdoptionRequest {
     const now = new Date();
     const entity = new AdoptionRequest(undefined, now, now);
     entity._petId = props.petId;
+    entity._protetorId = props.protetorId ?? null;
     entity._adopterId = props.adopterId;
-    entity._status = props.status ?? "received";
-    entity._preTriageStatus = props.preTriageStatus ?? "review";
+    entity._status = props.status ?? 'received';
+    entity._preTriageStatus = props.preTriageStatus ?? 'review';
     entity._matchScore = props.matchScore ?? null;
     entity._matchAnswers = props.matchAnswers ?? null;
     entity._notes = props.notes ?? null;
@@ -126,8 +150,13 @@ export class AdoptionRequest {
 
   static restore(props?: AdoptionRequestProps): AdoptionRequest | null {
     if (!props) return null;
-    const entity = new AdoptionRequest(props.id, props.createdAt, props.updatedAt);
+    const entity = new AdoptionRequest(
+      props.id,
+      props.createdAt,
+      props.updatedAt,
+    );
     entity._petId = props.petId;
+    entity._protetorId = props.protetorId ?? null;
     entity._adopterId = props.adopterId;
     entity._status = props.status;
     entity._preTriageStatus = props.preTriageStatus;

@@ -41,9 +41,7 @@ export class AdotantesController {
     description: 'Dados de entrada inválidos (validação ou regra de domínio)',
   })
   @ApiResponse({ status: 409, description: 'Email ou CPF já cadastrado' })
-  async criar(
-    @Body() dto: CriarAdotanteDto,
-  ): Promise<AdotanteResponseDto> {
+  async criar(@Body() dto: CriarAdotanteDto): Promise<AdotanteResponseDto> {
     return this.adotanteService.criar(dto);
   }
 
@@ -117,8 +115,7 @@ export class AdotantesController {
   })
   @ApiResponse({
     status: 404,
-    description:
-      'Perfil de adotante não encontrado para o usuário autenticado',
+    description: 'Perfil de adotante não encontrado para o usuário autenticado',
   })
   async atualizarMe(
     @CurrentUser() autenticado: AuthenticatedUser,

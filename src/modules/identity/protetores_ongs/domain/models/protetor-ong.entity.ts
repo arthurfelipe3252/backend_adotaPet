@@ -120,9 +120,7 @@ export class ProtetorOng {
     return this;
   }
 
-  static restaurar(
-    props?: ProtetorOngRestoreProps | null,
-  ): ProtetorOng | null {
+  static restaurar(props?: ProtetorOngRestoreProps | null): ProtetorOng | null {
     if (!props) return null;
     const p = new ProtetorOng(props.id, props.createdAt, props.updatedAt);
     p._usuarioId = props.usuarioId;
