@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { eq } from "drizzle-orm";
 import { DrizzleService } from "@shared/infra/database/drizzle.service";
 import { adoptionRequestsSchema } from "@adoption/adoption-requests/infra/schemas/adoption-requests.schema";
-import { AdoptionRequest, type AdoptionRequestStatus } from "@adoption/adoption-requests/domain/models/adoption-request.entity";
+import { AdoptionRequest, type AdoptionRequestStatus, type AdoptionPreTriageStatus } from "@adoption/adoption-requests/domain/models/adoption-request.entity";
 import { type AdoptionRequestRepository } from "@adoption/adoption-requests/domain/repositories/adoption-request-repository.interface";
 
 type AdoptionRequestRecord = typeof adoptionRequestsSchema.$inferSelect;
@@ -71,9 +71,11 @@ export class DrizzleAdoptionRequestRepository implements AdoptionRequestReposito
       petId: record.petId,
       adopterId: record.adopterId,
       status: record.status as AdoptionRequestStatus,
-      preTriageStatus: record.preTriageStatus,
+      preTriageStatus: record.preTriageStatus as AdoptionPreTriageStatus,
       matchScore: record.matchScore,
-      matchAnswers: record.matchAnswers,
+      matchAnswers: record.matchAnswers
+        ? (record.matchAnswers as Record<string, string | number | boolean | null>)
+        : null,
       notes: record.notes,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,

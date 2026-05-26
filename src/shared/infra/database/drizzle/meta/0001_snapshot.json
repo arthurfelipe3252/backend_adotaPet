@@ -1,6 +1,6 @@
 {
-  "id": "78076916-270a-4ff8-b934-23c0085ae1d8",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "aaaaaaaa-0001-0001-0001-000000000001",
+  "prevId": "78076916-270a-4ff8-b934-23c0085ae1d8",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -93,80 +93,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'disponivel'"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.adoption_requests": {
-      "name": "adoption_requests",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "pet_id": {
-          "name": "pet_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "adopter_id": {
-          "name": "adopter_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pre_triage_status": {
-          "name": "pre_triage_status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "match_score": {
-          "name": "match_score",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "match_answers": {
-          "name": "match_answers",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         },
         "created_at": {
           "name": "created_at",

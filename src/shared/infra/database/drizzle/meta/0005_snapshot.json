@@ -1,6 +1,6 @@
 {
-  "id": "78076916-270a-4ff8-b934-23c0085ae1d8",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "aaaaaaaa-0005-0005-0005-000000000005",
+  "prevId": "aaaaaaaa-0004-0004-0004-000000000004",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -105,6 +105,12 @@
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true
+        },
+        "fotos_urls": {
+          "name": "fotos_urls",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},

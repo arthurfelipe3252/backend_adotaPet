@@ -16,6 +16,6 @@ import { PET_REPOSITORY } from "./domain/repositories/pet-repository.interface";
       useExisting: DrizzlePetRepository,
     },
   ],
-  exports: [PetService],
+  exports: [PetService, PET_REPOSITORY, DrizzlePetRepository],
 })
 export class PetsModule {}
