@@ -26,8 +26,29 @@
     {
       "idx": 3,
       "version": "7",
+      "when": 1775765091005,
+      "tag": "0003_foto_url_pets",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1775765091006,
+      "tag": "0004_fotos_urls_pets",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
       "when": 1777586367718,
-      "tag": "0003_volatile_garia",
+      "tag": "0005_adoption_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1779750959017,
+      "tag": "0006_match_questionario",
       "breakpoints": true
     },
     {
