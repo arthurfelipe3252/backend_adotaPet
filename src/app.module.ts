@@ -6,6 +6,7 @@ import { CatalogModule } from './modules/catalog/catalog.module';
 import { IdentityModule } from '@identity/identity.module';
 import { AdoptionModule } from '@adoption/adoption.module';
 import { ChatModule } from '@chat/chat.module';
+import { ReportsModule } from '@reports/reports.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ChatModule } from '@chat/chat.module';
     IdentityModule,
     AdoptionModule,
     ChatModule,
+    ReportsModule,
   ],
   controllers: [HealthController],
 })

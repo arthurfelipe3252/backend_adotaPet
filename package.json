@@ -94,7 +94,8 @@
       "^@timeline/(.*)$": "<rootDir>/modules/timeline/$1",
       "^@geo/(.*)$": "<rootDir>/modules/geo/$1",
       "^@notifications/(.*)$": "<rootDir>/modules/notifications/$1",
-      "^@payments/(.*)$": "<rootDir>/modules/payments/$1"
+      "^@payments/(.*)$": "<rootDir>/modules/payments/$1",
+      "^@reports/(.*)$": "<rootDir>/modules/reports/$1"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"

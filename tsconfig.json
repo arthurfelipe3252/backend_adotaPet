@@ -50,6 +50,9 @@
       ],
       "@payments/*": [
         "src/modules/payments/*"
+      ],
+      "@reports/*": [
+        "src/modules/reports/*"
       ]
     }
   }
