@@ -1,0 +1,1083 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": { "200": { "description": "Aplicação em pé" } },
+        "summary": "Liveness probe — usado pelo Docker/Easypanel",
+        "tags": ["Health"]
+      }
+    },
+    "/api/v1/pets": {
+      "get": {
+        "operationId": "PetsController_findAll",
+        "parameters": [
+          {
+            "name": "especie",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "porte",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "castrado",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "protetorId",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Pets"]
+      },
+      "post": {
+        "operationId": "PetsController_create",
+        "parameters": [],
+        "responses": { "201": { "description": "" } },
+        "tags": ["Pets"]
+      }
+    },
+    "/api/v1/pets/{id}": {
+      "get": {
+        "operationId": "PetsController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Pets"]
+      },
+      "patch": {
+        "operationId": "PetsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Pets"]
+      },
+      "delete": {
+        "operationId": "PetsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "204": { "description": "" } },
+        "tags": ["Pets"]
+      }
+    },
+    "/api/v1/pets/protetor/{protetorId}": {
+      "get": {
+        "operationId": "PetsController_findByProtetor",
+        "parameters": [
+          {
+            "name": "protetorId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Pets"]
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "operationId": "UsuariosController_buscarPerfilProprio",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UsuarioResponseDto" }
+              }
+            }
+          },
+          "401": { "description": "Token ausente ou inválido" }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Retorna o perfil do usuário autenticado",
+        "tags": ["Users"]
+      }
+    },
+    "/api/v1/users/me/password": {
+      "patch": {
+        "description": "Requer a senha atual para confirmação. Retorna o usuário atualizado.",
+        "operationId": "UsuariosController_alterarSenha",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AlterarSenhaDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UsuarioResponseDto" }
+              }
+            }
+          },
+          "400": { "description": "Dados de entrada inválidos" },
+          "401": { "description": "Senha atual incorreta ou token inválido" }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Altera a senha do usuário autenticado",
+        "tags": ["Users"]
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "description": "Atualmente só é permitido buscar o próprio usuário. Tentar buscar outro retorna 403.",
+        "operationId": "UsuariosController_buscarPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID do usuário",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UsuarioResponseDto" }
+              }
+            }
+          },
+          "401": { "description": "Token ausente ou inválido" },
+          "403": { "description": "Tentando acessar dados de outro usuário" },
+          "404": { "description": "Usuário não encontrado" }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Retorna os dados de um usuário pelo identificador",
+        "tags": ["Users"]
+      },
+      "patch": {
+        "description": "Somente o próprio usuário pode alterar seus dados. Email e tipoUsuario são imutáveis após o cadastro.",
+        "operationId": "UsuariosController_atualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID do usuário",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AtualizarUsuarioDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UsuarioResponseDto" }
+              }
+            }
+          },
+          "400": { "description": "Dados de entrada inválidos" },
+          "401": { "description": "Token ausente ou inválido" },
+          "403": { "description": "Tentando alterar outro usuário" },
+          "404": { "description": "Usuário não encontrado" }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Atualiza dados básicos do usuário (nome, telefone)",
+        "tags": ["Users"]
+      },
+      "delete": {
+        "description": "Seta ativo = false. A linha do banco não é apagada. Somente o próprio usuário pode executar.",
+        "operationId": "UsuariosController_desativar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID do usuário",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Conta desativada com sucesso" },
+          "401": { "description": "Token ausente ou inválido" },
+          "403": { "description": "Tentando desativar outro usuário" },
+          "404": { "description": "Usuário não encontrado" }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Desativa a conta do usuário (soft delete)",
+        "tags": ["Users"]
+      }
+    },
+    "/api/v1/users/auth/login": {
+      "post": {
+        "description": "Retorna access token (curta duração) e refresh token (longa duração). Use o access token no header Authorization: Bearer <token>.",
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthResponseDto" }
+              }
+            }
+          },
+          "400": { "description": "Dados de entrada inválidos" },
+          "401": {
+            "description": "Credenciais inválidas (email não existe, senha errada ou conta inativa)"
+          }
+        },
+        "summary": "Autentica com email e senha",
+        "tags": ["Auth"]
+      }
+    },
+    "/api/v1/users/auth/refresh": {
+      "post": {
+        "description": "Recebe um refresh token válido, revoga ele e emite um novo par (access + refresh) atomicamente. Tentar reusar o refresh token anterior depois disso retorna 401.",
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshTokenDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthResponseDto" }
+              }
+            }
+          },
+          "400": { "description": "Dados de entrada inválidos" },
+          "401": {
+            "description": "Refresh token inválido, expirado, revogado ou já usado"
+          }
+        },
+        "summary": "Rotaciona o par de tokens",
+        "tags": ["Auth"]
+      }
+    },
+    "/api/v1/users/auth/logout": {
+      "post": {
+        "description": "Operação idempotente. Requer access token válido no header (além do refresh token no body) — comprova que o chamador tem a sessão ativa.",
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshTokenDto" }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Logout efetuado" },
+          "401": { "description": "Token de acesso ausente ou inválido" }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Revoga o refresh token informado",
+        "tags": ["Auth"]
+      }
+    },
+    "/api/v1/users/auth/logout-all": {
+      "post": {
+        "description": "Encerra todas as sessões ativas em todos os dispositivos. Requer access token válido no header.",
+        "operationId": "AuthController_logoutAll",
+        "parameters": [],
+        "responses": {
+          "204": { "description": "Todas as sessões encerradas" },
+          "401": { "description": "Token de acesso ausente ou inválido" }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Revoga todos os refresh tokens do usuário",
+        "tags": ["Auth"]
+      }
+    },
+    "/api/v1/users/adotantes": {
+      "post": {
+        "description": "Cria, em uma única transação: endereço (opcional) + usuário (tipoUsuario=adotante) + adotante. Em caso de falha em qualquer passo, nada é persistido.",
+        "operationId": "AdotantesController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CriarAdotanteDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Adotante cadastrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdotanteResponseDto" }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados de entrada inválidos (validação ou regra de domínio)"
+          },
+          "409": { "description": "Email ou CPF já cadastrado" }
+        },
+        "summary": "Cadastra um novo adotante",
+        "tags": ["Adotantes"]
+      }
+    },
+    "/api/v1/users/adotantes/me": {
+      "get": {
+        "description": "Inclui dados do usuário, do adotante (cpf, foto) e do endereço (quando cadastrado). O usuário é identificado pelo JWT — não há parâmetro de id.",
+        "operationId": "AdotantesController_buscarMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdotanteResponseDto" }
+              }
+            }
+          },
+          "401": { "description": "Token ausente ou inválido" },
+          "403": {
+            "description": "Usuário autenticado não é do tipo adotante"
+          },
+          "404": {
+            "description": "Perfil de adotante não encontrado para o usuário"
+          }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Retorna o perfil completo do adotante autenticado",
+        "tags": ["Adotantes"]
+      },
+      "patch": {
+        "description": "Aceita qualquer combinação de campos mutáveis. Endereço: omitido não mexe; objeto completo substitui in-place. Imutáveis: cpf, email, tipoUsuario. Para alterar senha, use PATCH /users/me/password.",
+        "operationId": "AdotantesController_atualizarMe",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AtualizarAdotanteDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdotanteResponseDto" }
+              }
+            }
+          },
+          "400": { "description": "Dados de entrada inválidos" },
+          "401": { "description": "Token ausente ou inválido" },
+          "403": {
+            "description": "Usuário autenticado não é do tipo adotante"
+          },
+          "404": {
+            "description": "Perfil de adotante não encontrado para o usuário autenticado"
+          }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Atualiza o perfil do adotante autenticado",
+        "tags": ["Adotantes"]
+      }
+    },
+    "/api/v1/users/protetores-ongs": {
+      "post": {
+        "description": "Cria, em uma única transação: endereço (opcional) + usuário (tipoUsuario=protetor|ong) + protetor_ong. O documento comprobatório (PDF/imagem em base64) é obrigatório.",
+        "operationId": "ProtetoresOngsController_criar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CriarProtetorOngDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Protetor/ONG cadastrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtetorOngResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados de entrada inválidos (CPF/CNPJ inválido, campo faltando, etc.)"
+          },
+          "409": { "description": "Email ou CPF/CNPJ já cadastrado" }
+        },
+        "summary": "Cadastra um novo protetor (PF) ou ONG (PJ)",
+        "tags": ["Protetores e ONGs"]
+      }
+    },
+    "/api/v1/users/protetores-ongs/me": {
+      "get": {
+        "description": "Inclui dados do usuário, do protetor/ong (cpfCnpj, descrição, foto, documento comprobatório, telefone de contato) e do endereço quando cadastrado. Aceita tipoUsuario protetor ou ong.",
+        "operationId": "ProtetoresOngsController_buscarMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtetorOngResponseDto"
+                }
+              }
+            }
+          },
+          "401": { "description": "Token ausente ou inválido" },
+          "403": {
+            "description": "Usuário autenticado não é protetor nem ong"
+          },
+          "404": {
+            "description": "Perfil de protetor/ong não encontrado para o usuário"
+          }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Retorna o perfil completo do protetor/ong autenticado",
+        "tags": ["Protetores e ONGs"]
+      },
+      "patch": {
+        "description": "Aceita qualquer combinação de campos mutáveis. Endereço: omitido não mexe; objeto completo substitui in-place. Imutáveis: cpfCnpj, email, tipoUsuario, documentoComprobatorio. Para alterar senha, use PATCH /users/me/password.",
+        "operationId": "ProtetoresOngsController_atualizarMe",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarProtetorOngDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtetorOngResponseDto"
+                }
+              }
+            }
+          },
+          "400": { "description": "Dados de entrada inválidos" },
+          "401": { "description": "Token ausente ou inválido" },
+          "403": {
+            "description": "Usuário autenticado não é protetor nem ong"
+          },
+          "404": {
+            "description": "Perfil de protetor/ong não encontrado para o usuário autenticado"
+          }
+        },
+        "security": [{ "access-token": [] }],
+        "summary": "Atualiza o perfil do protetor/ong autenticado",
+        "tags": ["Protetores e ONGs"]
+      }
+    },
+    "/api/v1/adoptions": {
+      "post": {
+        "operationId": "AdoptionRequestsController_create",
+        "parameters": [],
+        "responses": { "201": { "description": "" } },
+        "tags": ["AdoptionRequests"]
+      },
+      "get": {
+        "operationId": "AdoptionRequestsController_findAll",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["AdoptionRequests"]
+      }
+    },
+    "/api/v1/adoptions/{id}": {
+      "get": {
+        "operationId": "AdoptionRequestsController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["AdoptionRequests"]
+      },
+      "delete": {
+        "operationId": "AdoptionRequestsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["AdoptionRequests"]
+      }
+    },
+    "/api/v1/adoptions/{id}/status": {
+      "patch": {
+        "operationId": "AdoptionRequestsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["AdoptionRequests"]
+      }
+    }
+  },
+  "info": {
+    "title": "AdotaPet API",
+    "description": "Backend da plataforma de adoção responsável de pets",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    { "name": "Users", "description": "Gerenciamento de usuários" },
+    { "name": "Auth", "description": "Autenticação, login, refresh e logout" },
+    {
+      "name": "Adotantes",
+      "description": "Cadastro de adotantes (pessoa física)"
+    },
+    {
+      "name": "Protetores e ONGs",
+      "description": "Cadastro de protetores e organizações"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "access-token": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "description": "Cole o access token JWT obtido em /auth/login"
+      }
+    },
+    "schemas": {
+      "UsuarioResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único (UUID)",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "nome": { "type": "string", "example": "João Silva" },
+          "email": { "type": "string", "example": "joao@email.com" },
+          "telefone": {
+            "type": "object",
+            "example": "11987654321",
+            "nullable": true
+          },
+          "tipoUsuario": {
+            "type": "string",
+            "enum": ["adotante", "protetor", "ong"],
+            "example": "adotante"
+          },
+          "ativo": {
+            "type": "boolean",
+            "description": "Indica se a conta está ativa. Contas com ativo=false são soft-deleted.",
+            "example": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-04-09T15:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-04-09T15:30:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "email",
+          "tipoUsuario",
+          "ativo",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AlterarSenhaDto": {
+        "type": "object",
+        "properties": {
+          "senhaAtual": {
+            "type": "string",
+            "description": "Senha atual do usuário (para confirmação)",
+            "example": "senhaAntiga123"
+          },
+          "senhaNova": {
+            "type": "string",
+            "description": "Nova senha",
+            "example": "novaSenhaSegura456",
+            "minLength": 8,
+            "maxLength": 72
+          }
+        },
+        "required": ["senhaAtual", "senhaNova"]
+      },
+      "AtualizarUsuarioDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome completo do usuário ou da organização",
+            "example": "João Silva",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "telefone": {
+            "type": "string",
+            "description": "Telefone do usuário (somente dígitos, 10 ou 11 caracteres)",
+            "example": "11987654321"
+          }
+        }
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "example": "joao@email.com" },
+          "senha": { "type": "string", "example": "senhaSegura123" }
+        },
+        "required": ["email", "senha"]
+      },
+      "AuthResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "JWT de acesso. Use no header Authorization: Bearer <token>",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token opaco. Guarde com segurança e envie em /users/auth/refresh para obter novo par.",
+            "example": "kQz8x2yC5..."
+          },
+          "expiresIn": {
+            "type": "number",
+            "description": "Tempo de validade do access token, em segundos",
+            "example": 86400
+          },
+          "user": { "$ref": "#/components/schemas/UsuarioResponseDto" }
+        },
+        "required": ["accessToken", "refreshToken", "expiresIn", "user"]
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token obtido em /auth/login (string opaca, base64url)",
+            "example": "kQz8x2yC5...long-string"
+          }
+        },
+        "required": ["refreshToken"]
+      },
+      "EnderecoDto": {
+        "type": "object",
+        "properties": {
+          "logradouro": {
+            "type": "string",
+            "example": "Rua das Flores",
+            "maxLength": 255
+          },
+          "numero": { "type": "string", "example": "123", "maxLength": 20 },
+          "complemento": {
+            "type": "string",
+            "example": "Apto 42",
+            "maxLength": 100
+          },
+          "bairro": { "type": "string", "example": "Centro", "maxLength": 100 },
+          "cidade": {
+            "type": "string",
+            "example": "São Paulo",
+            "maxLength": 100
+          },
+          "estado": {
+            "type": "string",
+            "example": "SP",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "cep": {
+            "type": "string",
+            "example": "01000000",
+            "description": "CEP com 8 dígitos, sem máscara"
+          }
+        },
+        "required": [
+          "logradouro",
+          "numero",
+          "bairro",
+          "cidade",
+          "estado",
+          "cep"
+        ]
+      },
+      "CriarAdotanteDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "Ana Silva",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "email": {
+            "type": "string",
+            "example": "ana@email.com",
+            "maxLength": 150,
+            "description": "Será normalizado para lowercase"
+          },
+          "senha": {
+            "type": "string",
+            "example": "senhaSegura123",
+            "minLength": 8,
+            "maxLength": 72,
+            "description": "Texto puro; será hasheada com bcrypt"
+          },
+          "telefone": {
+            "type": "string",
+            "example": "11987654321",
+            "description": "Somente dígitos, 10 ou 11 caracteres"
+          },
+          "cpf": {
+            "type": "string",
+            "example": "39053344705",
+            "description": "CPF com 11 dígitos. Aceita com ou sem máscara — caracteres não numéricos são removidos antes da validação. Dígito verificador é checado."
+          },
+          "imagemBase64": {
+            "type": "string",
+            "description": "Foto de perfil em base64. Limite ~5 MB de arquivo binário (equivalente a ~7 MB de string base64)."
+          },
+          "endereco": {
+            "description": "Endereço residencial. Obrigatório no cadastro.",
+            "allOf": [{ "$ref": "#/components/schemas/EnderecoDto" }]
+          }
+        },
+        "required": ["nome", "email", "senha", "cpf", "endereco"]
+      },
+      "EnderecoResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "logradouro": { "type": "string", "example": "Rua das Flores" },
+          "numero": { "type": "string", "example": "123" },
+          "complemento": {
+            "type": "object",
+            "example": "Apto 42",
+            "nullable": true
+          },
+          "bairro": { "type": "string", "example": "Centro" },
+          "cidade": { "type": "string", "example": "São Paulo" },
+          "estado": { "type": "string", "example": "SP" },
+          "cep": { "type": "string", "example": "01000000" },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-04-09T15:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-04-09T15:30:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "logradouro",
+          "numero",
+          "bairro",
+          "cidade",
+          "estado",
+          "cep",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AdotanteResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador do adotante (UUID)",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "cpf": {
+            "type": "string",
+            "description": "CPF (11 dígitos, sem máscara)"
+          },
+          "imagemBase64": { "type": "object", "nullable": true },
+          "enderecoId": { "type": "object", "nullable": true },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-04-09T15:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-04-09T15:30:00.000Z"
+          },
+          "usuario": { "$ref": "#/components/schemas/UsuarioResponseDto" },
+          "endereco": {
+            "nullable": true,
+            "allOf": [{ "$ref": "#/components/schemas/EnderecoResponseDto" }]
+          }
+        },
+        "required": ["id", "cpf", "createdAt", "updatedAt", "usuario"]
+      },
+      "AtualizarAdotanteDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "Ana Silva",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "telefone": {
+            "type": "string",
+            "example": "11987654321",
+            "description": "Somente dígitos, 10 ou 11 caracteres"
+          },
+          "imagemBase64": {
+            "type": "string",
+            "description": "Foto de perfil em base64. Limite ~5 MB de arquivo binário (equivalente a ~7 MB de string base64)."
+          },
+          "endereco": {
+            "description": "Omita para não mexer no endereço atual; envie objeto completo para substituí-lo. Não aceita `null` (endereço é obrigatório).",
+            "allOf": [{ "$ref": "#/components/schemas/EnderecoDto" }]
+          }
+        }
+      },
+      "CriarProtetorOngDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "ONG Patinhas Felizes",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "email": {
+            "type": "string",
+            "example": "contato@patinhas.org",
+            "maxLength": 150
+          },
+          "senha": {
+            "type": "string",
+            "example": "senhaSegura123",
+            "minLength": 8,
+            "maxLength": 72
+          },
+          "telefone": {
+            "type": "string",
+            "example": "11987654321",
+            "description": "Telefone pessoal do responsável (10 ou 11 dígitos)"
+          },
+          "tipoUsuario": {
+            "type": "string",
+            "enum": ["protetor", "ong"],
+            "example": "ong",
+            "description": "Discriminador entre protetor (PF, CPF de 11 dígitos) e ONG (PJ, CNPJ de 14 dígitos)"
+          },
+          "cpfCnpj": {
+            "type": "string",
+            "example": "11444777000161",
+            "description": "CPF (11 dígitos) se tipoUsuario=protetor; CNPJ (14 dígitos) se tipoUsuario=ong. Aceita com ou sem máscara. Dígito verificador é validado."
+          },
+          "descricao": {
+            "type": "string",
+            "example": "ONG dedicada à adoção responsável de cães e gatos.",
+            "maxLength": 2000
+          },
+          "telefoneContato": {
+            "type": "string",
+            "example": "11999998888",
+            "description": "Telefone público de contato da organização"
+          },
+          "imagemBase64": {
+            "type": "string",
+            "description": "Foto de perfil em base64. Limite ~5 MB de arquivo binário (equivalente a ~7 MB de string base64)."
+          },
+          "documentoComprobatorio": {
+            "type": "string",
+            "description": "Documento comprobatório (PDF ou imagem) em base64 — comprova identidade/CNPJ. Limite ~5 MB de arquivo binário (~7 MB de string base64). Obrigatório para todo protetor/ONG."
+          },
+          "endereco": {
+            "description": "Endereço da organização ou do protetor. Obrigatório no cadastro.",
+            "allOf": [{ "$ref": "#/components/schemas/EnderecoDto" }]
+          }
+        },
+        "required": [
+          "nome",
+          "email",
+          "senha",
+          "tipoUsuario",
+          "cpfCnpj",
+          "documentoComprobatorio",
+          "endereco"
+        ]
+      },
+      "ProtetorOngResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "cpfCnpj": {
+            "type": "string",
+            "description": "CPF (11 dígitos) ou CNPJ (14 dígitos), sem máscara"
+          },
+          "descricao": { "type": "object", "nullable": true },
+          "telefoneContato": { "type": "object", "nullable": true },
+          "imagemBase64": {
+            "type": "object",
+            "nullable": true,
+            "description": "Foto de perfil em base64"
+          },
+          "documentoComprobatorio": {
+            "type": "string",
+            "description": "Documento comprobatório (PDF/imagem) em base64"
+          },
+          "enderecoId": { "type": "object", "nullable": true },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-04-09T15:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-04-09T15:30:00.000Z"
+          },
+          "usuario": { "$ref": "#/components/schemas/UsuarioResponseDto" },
+          "endereco": {
+            "nullable": true,
+            "allOf": [{ "$ref": "#/components/schemas/EnderecoResponseDto" }]
+          }
+        },
+        "required": [
+          "id",
+          "cpfCnpj",
+          "documentoComprobatorio",
+          "createdAt",
+          "updatedAt",
+          "usuario"
+        ]
+      },
+      "AtualizarProtetorOngDto": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "example": "ONG Patinhas Felizes",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "telefone": { "type": "string", "example": "11987654321" },
+          "descricao": {
+            "type": "string",
+            "example": "ONG dedicada à adoção responsável",
+            "maxLength": 2000
+          },
+          "telefoneContato": { "type": "string", "example": "11999998888" },
+          "imagemBase64": {
+            "type": "string",
+            "description": "Foto de perfil em base64. Limite ~5 MB de arquivo binário (equivalente a ~7 MB de string base64)."
+          },
+          "endereco": {
+            "description": "Omita para não mexer no endereço atual; envie objeto completo para substituí-lo. Não aceita `null` (endereço é obrigatório).",
+            "allOf": [{ "$ref": "#/components/schemas/EnderecoDto" }]
+          }
+        }
+      }
+    }
+  }
+}
