@@ -34,10 +34,7 @@ export async function resolveProtetorIdOrFail(
   usuarioId: string,
   tipoUsuario: TipoUsuario,
 ): Promise<string> {
-  if (
-    tipoUsuario !== TipoUsuario.Protetor &&
-    tipoUsuario !== TipoUsuario.Ong
-  ) {
+  if (tipoUsuario !== TipoUsuario.Protetor && tipoUsuario !== TipoUsuario.Ong) {
     throw new ForbiddenException(
       'Apenas usuários do tipo protetor ou ong podem acessar este recurso',
     );

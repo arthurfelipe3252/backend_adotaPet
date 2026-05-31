@@ -72,11 +72,7 @@ export class QuestionarioMatchController {
     @Param('adotanteId', ParseUUIDPipe) adotanteId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.service.calcularMatch(
-      adotanteId,
-      user.id,
-      user.tipoUsuario,
-    );
+    return this.service.calcularMatch(adotanteId, user.id, user.tipoUsuario);
   }
 
   // DELETE /api/v1/match/questionario — meu questionário

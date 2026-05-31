@@ -109,11 +109,7 @@ export class MessageService {
       await this.conversationRepository.findById(conversationId);
     if (!conversation) throw new NotFoundException('Conversa não encontrada');
 
-    await this.resolveParticipantIdOrFail(
-      conversation,
-      usuarioId,
-      tipoUsuario,
-    );
+    await this.resolveParticipantIdOrFail(conversation, usuarioId, tipoUsuario);
 
     const messages = await this.messageRepository.findByConversation({
       conversationId,
@@ -138,11 +134,7 @@ export class MessageService {
     );
     if (!conversation) throw new NotFoundException('Conversa não encontrada');
 
-    await this.resolveParticipantIdOrFail(
-      conversation,
-      usuarioId,
-      tipoUsuario,
-    );
+    await this.resolveParticipantIdOrFail(conversation, usuarioId, tipoUsuario);
 
     message.withRead(dto.isRead).touch(new Date());
     await this.messageRepository.update(message);
@@ -205,9 +197,7 @@ export class MessageService {
     const adopterSummary = adopters.get(conversation.adopterId);
     const protetorSummary = protetores.get(conversation.protetorId);
     return {
-      adopter: adopterSummary
-        ? { ...adopterSummary, tipo: 'adotante' }
-        : null,
+      adopter: adopterSummary ? { ...adopterSummary, tipo: 'adotante' } : null,
       protetor: protetorSummary
         ? { ...protetorSummary, tipo: 'protetor' }
         : null,

@@ -2,6 +2,8 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { MessageService } from '@chat/conversations/application/services/message.service';
 import { Message } from '@chat/conversations/domain/models/message.entity';
 import { Conversation } from '@chat/conversations/domain/models/conversation.entity';
+import type { AdotanteRepository } from '@identity/adotantes/domain/repositories/adotante-repository.interface';
+import type { ProtetorOngRepository } from '@identity/protetores_ongs/domain/repositories/protetor-ong-repository.interface';
 import { TipoUsuario } from '@identity/usuarios/domain/enums/tipo-usuario.enum';
 
 const conversationId = '11111111-1111-1111-1111-111111111111';
@@ -50,8 +52,8 @@ describe('MessageService', () => {
   const service = new MessageService(
     messageRepository,
     conversationRepository,
-    adotanteRepository as any,
-    protetorRepository as any,
+    adotanteRepository as unknown as AdotanteRepository,
+    protetorRepository as unknown as ProtetorOngRepository,
   );
 
   beforeEach(() => {
@@ -74,12 +76,9 @@ describe('MessageService', () => {
     conversationRepository.findById.mockResolvedValue(null);
 
     await expect(
-      service.create(
-        conversationId,
-        adopterUsuarioId,
-        TipoUsuario.Adotante,
-        { content: 'Oi' },
-      ),
+      service.create(conversationId, adopterUsuarioId, TipoUsuario.Adotante, {
+        content: 'Oi',
+      }),
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
@@ -99,7 +98,7 @@ describe('MessageService', () => {
   it('creates a message and updates the conversation', async () => {
     conversationRepository.findById.mockResolvedValue(buildConversation());
     // create agora retorna a entidade reidratada com id do banco
-    messageRepository.create.mockImplementation((msg) =>
+    messageRepository.create.mockImplementation((msg: Message) =>
       Message.restore({
         id: '88888888-8888-8888-8888-888888888888',
         conversationId: msg.conversationId,

@@ -72,10 +72,7 @@ export class PetsController {
   // POST /pets — apenas protetor/ong; protetorId vem do JWT
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: CreatePetDto,
-  ) {
+  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreatePetDto) {
     return this.petService.create(user.id, user.tipoUsuario, dto);
   }
 

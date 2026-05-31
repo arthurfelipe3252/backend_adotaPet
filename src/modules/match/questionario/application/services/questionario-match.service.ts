@@ -127,10 +127,7 @@ export class QuestionarioMatchService {
     return this.calcularInterno(adotanteIdParam);
   }
 
-  async remover(
-    usuarioId: string,
-    tipoUsuario: TipoUsuario,
-  ): Promise<void> {
+  async remover(usuarioId: string, tipoUsuario: TipoUsuario): Promise<void> {
     const adotanteId = await resolveAdotanteIdOrFail(
       this.adotanteRepo,
       usuarioId,

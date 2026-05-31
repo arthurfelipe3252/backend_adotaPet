@@ -156,9 +156,7 @@ export class AdoptionRequestService {
       tipoUsuario,
     );
     if (request.protetorId !== protetorId) {
-      throw new ForbiddenException(
-        'Solicitação pertence a outro protetor/ong',
-      );
+      throw new ForbiddenException('Solicitação pertence a outro protetor/ong');
     }
 
     request.withStatus(dto.status).touch(new Date());
@@ -211,9 +209,7 @@ export class AdoptionRequestService {
       tipoUsuario,
     );
     if (request.protetorId !== protetorId) {
-      throw new ForbiddenException(
-        'Solicitação pertence a outro protetor/ong',
-      );
+      throw new ForbiddenException('Solicitação pertence a outro protetor/ong');
     }
   }
 

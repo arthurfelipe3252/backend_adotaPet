@@ -37,12 +37,7 @@ export class MessagesController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateMessageDto,
   ) {
-    return this.service.create(
-      conversationId,
-      user.id,
-      user.tipoUsuario,
-      dto,
-    );
+    return this.service.create(conversationId, user.id, user.tipoUsuario, dto);
   }
 
   @Get('conversations/:conversationId/messages')
@@ -65,11 +60,6 @@ export class MessagesController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateMessageReadDto,
   ) {
-    return this.service.updateReadStatus(
-      id,
-      user.id,
-      user.tipoUsuario,
-      dto,
-    );
+    return this.service.updateReadStatus(id, user.id, user.tipoUsuario, dto);
   }
 }
