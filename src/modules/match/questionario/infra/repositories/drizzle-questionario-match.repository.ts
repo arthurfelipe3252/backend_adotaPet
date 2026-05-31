@@ -1,12 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { eq } from "drizzle-orm";
-import { DrizzleService } from "@shared/infra/database/drizzle.service";
-import { QuestionarioMatch } from "../../domain/models/questionario-match.entity";
-import type { QuestionarioMatchRepository } from "../../domain/repositories/questionario-match-repository.interface";
+import { Injectable } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
+import { DrizzleService } from '@shared/infra/database/drizzle.service';
+import { QuestionarioMatch } from '../../domain/models/questionario-match.entity';
+import type { QuestionarioMatchRepository } from '../../domain/repositories/questionario-match-repository.interface';
 import {
   questionarioMatchSchema,
   type QuestionarioMatchRow,
-} from "../schemas/questionario-match.schema";
+} from '../schemas/questionario-match.schema';
 
 @Injectable()
 export class DrizzleQuestionarioMatchRepository implements QuestionarioMatchRepository {
@@ -64,7 +64,9 @@ export class DrizzleQuestionarioMatchRepository implements QuestionarioMatchRepo
     return this.toEntity(row);
   }
 
-  async findByAdotanteId(adotanteId: string): Promise<QuestionarioMatch | null> {
+  async findByAdotanteId(
+    adotanteId: string,
+  ): Promise<QuestionarioMatch | null> {
     const rows = await this.drizzle.db
       .select()
       .from(questionarioMatchSchema)

@@ -201,10 +201,7 @@ export class DashboardService {
       .filter((d): d is TopPetDto => d !== null);
   }
 
-  async getStalePets(
-    protetorId: string,
-    days: number,
-  ): Promise<StalePetDto[]> {
+  async getStalePets(protetorId: string, days: number): Promise<StalePetDto[]> {
     const stale = await this.petsReporting.findStalePets(protetorId, days);
     const now = Date.now();
     const msPerDay = 1000 * 60 * 60 * 24;

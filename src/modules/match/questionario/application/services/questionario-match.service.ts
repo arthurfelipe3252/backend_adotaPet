@@ -1,16 +1,16 @@
-import { Injectable, Inject, NotFoundException } from "@nestjs/common";
-import { PET_REPOSITORY } from "@catalog/pets/domain/repositories/pet-repository.interface";
-import type { PetRepository } from "@catalog/pets/domain/repositories/pet-repository.interface";
-import { QUESTIONARIO_MATCH_REPOSITORY } from "@match/questionario/domain/repositories/questionario-match-repository.interface";
-import type { QuestionarioMatchRepository } from "@match/questionario/domain/repositories/questionario-match-repository.interface";
-import { QuestionarioMatch } from "@match/questionario/domain/models/questionario-match.entity";
-import { MatchScoringService } from "./match-scoring.service";
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { PET_REPOSITORY } from '@catalog/pets/domain/repositories/pet-repository.interface';
+import type { PetRepository } from '@catalog/pets/domain/repositories/pet-repository.interface';
+import { QUESTIONARIO_MATCH_REPOSITORY } from '@match/questionario/domain/repositories/questionario-match-repository.interface';
+import type { QuestionarioMatchRepository } from '@match/questionario/domain/repositories/questionario-match-repository.interface';
+import { QuestionarioMatch } from '@match/questionario/domain/models/questionario-match.entity';
+import { MatchScoringService } from './match-scoring.service';
 import type {
   SalvarQuestionarioDto,
   MatchResultItemDto,
   MatchResultResponseDto,
   QuestionarioMatchResponseDto,
-} from "@match/questionario/application/dto/questionario-match.dto";
+} from '@match/questionario/application/dto/questionario-match.dto';
 
 @Injectable()
 export class QuestionarioMatchService {
@@ -37,7 +37,10 @@ export class QuestionarioMatchService {
     };
   }
 
-  async salvar(adotanteId: string, dto: SalvarQuestionarioDto): Promise<QuestionarioMatchResponseDto> {
+  async salvar(
+    adotanteId: string,
+    dto: SalvarQuestionarioDto,
+  ): Promise<QuestionarioMatchResponseDto> {
     const questionario = QuestionarioMatch.create({
       adotanteId,
       tipoMoradia: dto.tipoMoradia,
@@ -51,21 +54,27 @@ export class QuestionarioMatchService {
     return this.toResponse(salvo);
   }
 
-  async buscarPorAdotante(adotanteId: string): Promise<QuestionarioMatchResponseDto> {
+  async buscarPorAdotante(
+    adotanteId: string,
+  ): Promise<QuestionarioMatchResponseDto> {
     const q = await this.questionarioRepo.findByAdotanteId(adotanteId);
-    if (!q) throw new NotFoundException(`Adotante ${adotanteId} ainda não respondeu ao questionário de match.`);
+    if (!q)
+      throw new NotFoundException(
+        `Adotante ${adotanteId} ainda não respondeu ao questionário de match.`,
+      );
     return this.toResponse(q);
   }
 
   async calcularMatch(adotanteId: string): Promise<MatchResultResponseDto> {
-    const questionario = await this.questionarioRepo.findByAdotanteId(adotanteId);
+    const questionario =
+      await this.questionarioRepo.findByAdotanteId(adotanteId);
     if (!questionario) {
       throw new NotFoundException(
         `Adotante ${adotanteId} ainda não respondeu ao questionário de match. ` +
-        `Envie as respostas em POST /api/v1/match/questionario antes de calcular.`,
+          `Envie as respostas em POST /api/v1/match/questionario antes de calcular.`,
       );
     }
-    const pets = await this.petRepo.findAll({ status: "disponivel" });
+    const pets = await this.petRepo.findAll({ status: 'disponivel' });
     const resultados: MatchResultItemDto[] = pets
       .map((pet) => ({
         petId: pet.id!,
@@ -94,7 +103,10 @@ export class QuestionarioMatchService {
 
   async remover(adotanteId: string): Promise<void> {
     const q = await this.questionarioRepo.findByAdotanteId(adotanteId);
-    if (!q) throw new NotFoundException(`Adotante ${adotanteId} não possui questionário de match.`);
+    if (!q)
+      throw new NotFoundException(
+        `Adotante ${adotanteId} não possui questionário de match.`,
+      );
     await this.questionarioRepo.deleteByAdotanteId(adotanteId);
   }
 }

@@ -1,4 +1,4 @@
-import { IsEnum } from "class-validator";
+import { IsEnum } from 'class-validator';
 import type {
   CriancasEmCasa,
   Disponibilidade,
@@ -6,25 +6,40 @@ import type {
   OutrosPets,
   PerfilCompanheiro,
   TipoMoradia,
-} from "@match/questionario/domain/models/questionario-match.entity";
+} from '@match/questionario/domain/models/questionario-match.entity';
 
 export class SalvarQuestionarioDto {
-  @IsEnum(["casa_quintal_grande", "casa_quintal_pequeno", "apartamento", "apartamento_lazer"])
+  @IsEnum([
+    'casa_quintal_grande',
+    'casa_quintal_pequeno',
+    'apartamento',
+    'apartamento_lazer',
+  ])
   tipoMoradia!: TipoMoradia;
 
-  @IsEnum(["fica_em_casa", "sai_almoco", "passa_dia_fora", "viaja_frequentemente"])
+  @IsEnum([
+    'fica_em_casa',
+    'sai_almoco',
+    'passa_dia_fora',
+    'viaja_frequentemente',
+  ])
   disponibilidade!: Disponibilidade;
 
-  @IsEnum(["sim_tem_experiencia", "sim_faz_tempo", "nunca_quer_aprender", "primeiro_pet_familia"])
+  @IsEnum([
+    'sim_tem_experiencia',
+    'sim_faz_tempo',
+    'nunca_quer_aprender',
+    'primeiro_pet_familia',
+  ])
   experienciaPrevia!: ExperienciaPrevia;
 
-  @IsEnum(["bebe", "crianca_pequena", "crianca_maior", "nao"])
+  @IsEnum(['bebe', 'crianca_pequena', 'crianca_maior', 'nao'])
   criancasEmCasa!: CriancasEmCasa;
 
-  @IsEnum(["cao", "gato", "outros", "nao"])
+  @IsEnum(['cao', 'gato', 'outros', 'nao'])
   outrosPets!: OutrosPets;
 
-  @IsEnum(["tranquilo", "energetico", "carinhoso", "inteligente"])
+  @IsEnum(['tranquilo', 'energetico', 'carinhoso', 'inteligente'])
   perfilCompanheiro!: PerfilCompanheiro;
 }
 

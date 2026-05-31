@@ -95,7 +95,9 @@ export class DrizzleAdoptionReportingAdapter implements AdoptionReporting {
     // linhas — devolvemos null nesse caso (sem média definida).
     const [row] = await this.drizzle.db
       .select({
-        avg: sql<string | null>`AVG(EXTRACT(EPOCH FROM (${adoptionRequestsSchema.updatedAt} - ${adoptionRequestsSchema.createdAt})) / 86400)`,
+        avg: sql<
+          string | null
+        >`AVG(EXTRACT(EPOCH FROM (${adoptionRequestsSchema.updatedAt} - ${adoptionRequestsSchema.createdAt})) / 86400)`,
       })
       .from(adoptionRequestsSchema)
       .innerJoin(petsSchema, eq(petsSchema.id, adoptionRequestsSchema.petId))
