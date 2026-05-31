@@ -8,9 +8,20 @@ import { DrizzleConversationRepository } from '@chat/conversations/infra/reposit
 import { DrizzleMessageRepository } from '@chat/conversations/infra/repositories/drizzle-message.repository';
 import { CONVERSATION_REPOSITORY } from '@chat/conversations/domain/repositories/conversation-repository.interface';
 import { MESSAGE_REPOSITORY } from '@chat/conversations/domain/repositories/message-repository.interface';
+import { AdotantesModule } from '@identity/adotantes/adotantes.module';
+import { ProtetoresOngsModule } from '@identity/protetores_ongs/protetores-ongs.module';
+import { AdoptionRequestsModule } from '@adoption/adoption-requests/adoption-requests.module';
 
 @Module({
-  imports: [SharedModule],
+  // AdotantesModule, ProtetoresOngsModule: resolução de adopterId/protetorId
+  // a partir do JWT. AdoptionRequestsModule: descobrir os participantes
+  // legítimos da conversa (vindos da adoption_request).
+  imports: [
+    SharedModule,
+    AdotantesModule,
+    ProtetoresOngsModule,
+    AdoptionRequestsModule,
+  ],
   controllers: [ConversationsController, MessagesController],
   providers: [
     ConversationService,

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq, type SQL } from 'drizzle-orm';
 import { DrizzleService } from '@shared/infra/database/drizzle.service';
 import { adoptionRequestsSchema } from '@adoption/adoption-requests/infra/schemas/adoption-requests.schema';
 import {
@@ -7,7 +7,10 @@ import {
   type AdoptionPreTriageStatus,
   type AdoptionRequestStatus,
 } from '@adoption/adoption-requests/domain/models/adoption-request.entity';
-import { type AdoptionRequestRepository } from '@adoption/adoption-requests/domain/repositories/adoption-request-repository.interface';
+import {
+  type AdoptionRequestFilters,
+  type AdoptionRequestRepository,
+} from '@adoption/adoption-requests/domain/repositories/adoption-request-repository.interface';
 
 type AdoptionRequestRecord = typeof adoptionRequestsSchema.$inferSelect;
 
@@ -15,19 +18,23 @@ type AdoptionRequestRecord = typeof adoptionRequestsSchema.$inferSelect;
 export class DrizzleAdoptionRequestRepository implements AdoptionRequestRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
-  async create(request: AdoptionRequest): Promise<void> {
-    await this.drizzle.db.insert(adoptionRequestsSchema).values({
-      petId: request.petId,
-      protetorId: request.protetorId ?? null,
-      adopterId: request.adopterId,
-      status: request.status,
-      preTriageStatus: request.preTriageStatus,
-      matchScore: request.matchScore ?? null,
-      matchAnswers: request.matchAnswers ?? null,
-      notes: request.notes ?? null,
-      createdAt: request.createdAt ?? new Date(),
-      updatedAt: request.updatedAt ?? new Date(),
-    });
+  async create(request: AdoptionRequest): Promise<AdoptionRequest> {
+    const [row] = await this.drizzle.db
+      .insert(adoptionRequestsSchema)
+      .values({
+        petId: request.petId,
+        protetorId: request.protetorId ?? null,
+        adopterId: request.adopterId,
+        status: request.status,
+        preTriageStatus: request.preTriageStatus,
+        matchScore: request.matchScore ?? null,
+        matchAnswers: request.matchAnswers ?? null,
+        notes: request.notes ?? null,
+        createdAt: request.createdAt ?? new Date(),
+        updatedAt: request.updatedAt ?? new Date(),
+      })
+      .returning();
+    return this.mapToEntity(row)!;
   }
 
   async update(request: AdoptionRequest): Promise<void> {
@@ -53,8 +60,20 @@ export class DrizzleAdoptionRequestRepository implements AdoptionRequestReposito
       .where(eq(adoptionRequestsSchema.id, id));
   }
 
-  async findAll(): Promise<AdoptionRequest[]> {
-    const rows = await this.drizzle.db.select().from(adoptionRequestsSchema);
+  async findAll(filters?: AdoptionRequestFilters): Promise<AdoptionRequest[]> {
+    const where: SQL[] = [];
+    if (filters?.adopterId) {
+      where.push(eq(adoptionRequestsSchema.adopterId, filters.adopterId));
+    }
+    if (filters?.protetorId) {
+      where.push(eq(adoptionRequestsSchema.protetorId, filters.protetorId));
+    }
+
+    const query = this.drizzle.db.select().from(adoptionRequestsSchema);
+    const rows = where.length
+      ? await query.where(where.length === 1 ? where[0] : and(...where))
+      : await query;
+
     return rows
       .map((row) => this.mapToEntity(row))
       .filter((row): row is AdoptionRequest => row !== null);

@@ -3,5 +3,6 @@ import { AdoptionRequestsModule } from '@adoption/adoption-requests/adoption-req
 
 @Module({
   imports: [AdoptionRequestsModule],
+  exports: [AdoptionRequestsModule],
 })
 export class AdoptionModule {}

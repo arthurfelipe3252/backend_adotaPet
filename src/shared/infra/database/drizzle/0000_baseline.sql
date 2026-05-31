@@ -1,3 +1,7 @@
+CREATE TYPE "public"."especie" AS ENUM('cao', 'gato', 'outro');--jp> statement-breakpoint
+CREATE TYPE "public"."pet_status" AS ENUM('disponivel', 'em_processo', 'adotado');--> statement-breakpoint
+CREATE TYPE "public"."porte" AS ENUM('pequeno', 'medio', 'grande');--> statement-breakpoint
+CREATE TYPE "public"."sexo" AS ENUM('macho', 'femea');--> statement-breakpoint
 CREATE TYPE "public"."tipo_usuario" AS ENUM('adotante', 'protetor', 'ong');--> statement-breakpoint
 CREATE TYPE "public"."criancas_em_casa" AS ENUM('bebe', 'crianca_pequena', 'crianca_maior', 'nao');--> statement-breakpoint
 CREATE TYPE "public"."disponibilidade_match" AS ENUM('fica_em_casa', 'sai_almoco', 'passa_dia_fora', 'viaja_frequentemente');--> statement-breakpoint
@@ -5,6 +9,60 @@ CREATE TYPE "public"."experiencia_previa" AS ENUM('sim_tem_experiencia', 'sim_fa
 CREATE TYPE "public"."outros_pets_match" AS ENUM('cao', 'gato', 'outros', 'nao');--> statement-breakpoint
 CREATE TYPE "public"."perfil_companheiro" AS ENUM('tranquilo', 'energetico', 'carinhoso', 'inteligente');--> statement-breakpoint
 CREATE TYPE "public"."tipo_moradia" AS ENUM('casa_quintal_grande', 'casa_quintal_pequeno', 'apartamento', 'apartamento_lazer');--> statement-breakpoint
+CREATE TABLE "adoption_requests" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"pet_id" uuid NOT NULL,
+	"protetor_id" uuid,
+	"adopter_id" uuid NOT NULL,
+	"status" text NOT NULL,
+	"pre_triage_status" text NOT NULL,
+	"match_score" integer,
+	"match_answers" jsonb,
+	"notes" text,
+	"created_at" timestamp with time zone NOT NULL,
+	"updated_at" timestamp with time zone NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "pets" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"protetor_id" uuid NOT NULL,
+	"nome" varchar(100) NOT NULL,
+	"especie" "especie" NOT NULL,
+	"raca" varchar(100),
+	"porte" "porte" NOT NULL,
+	"sexo" "sexo" NOT NULL,
+	"idade_meses" smallint NOT NULL,
+	"castrado" boolean DEFAULT false NOT NULL,
+	"vacinado" boolean DEFAULT false NOT NULL,
+	"descricao" text,
+	"temperamento" text,
+	"status" "pet_status" DEFAULT 'disponivel' NOT NULL,
+	"fotos_urls" text,
+	"created_at" timestamp with time zone NOT NULL,
+	"updated_at" timestamp with time zone NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "conversations" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"adoption_request_id" uuid NOT NULL,
+	"adopter_id" uuid NOT NULL,
+	"protetor_id" uuid NOT NULL,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "conversations_adoption_request_id_unique" UNIQUE("adoption_request_id")
+);
+--> statement-breakpoint
+CREATE TABLE "messages" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"conversation_id" uuid NOT NULL,
+	"sender_id" uuid NOT NULL,
+	"content" text NOT NULL,
+	"is_read" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "adotantes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"usuario_id" uuid NOT NULL,
@@ -90,4 +148,5 @@ ALTER TABLE "adotantes" ADD CONSTRAINT "adotantes_usuario_id_usuarios_id_fk" FOR
 ALTER TABLE "adotantes" ADD CONSTRAINT "adotantes_endereco_id_enderecos_id_fk" FOREIGN KEY ("endereco_id") REFERENCES "public"."enderecos"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "protetores_ongs" ADD CONSTRAINT "protetores_ongs_usuario_id_usuarios_id_fk" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "protetores_ongs" ADD CONSTRAINT "protetores_ongs_endereco_id_enderecos_id_fk" FOREIGN KEY ("endereco_id") REFERENCES "public"."enderecos"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_usuario_id_usuarios_id_fk" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_usuario_id_usuarios_id_fk" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "idx_messages_conversation_created_at" ON "messages" USING btree ("conversation_id","created_at");

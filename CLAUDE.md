@@ -15,12 +15,14 @@ Plataforma de adoção responsável de pets. Monolito modular NestJS com Clean A
 ```bash
 npm run dev              # Inicia em modo watch
 npm run build            # Compila o projeto
-npm run db:generate      # Gera migrations a partir dos schemas
-npm run db:migrate       # Aplica migrations pendentes
-npm run db:push          # Sincroniza schema direto (dev only)
+npm run db:generate      # Gera migrations a partir dos schemas TS
+npm run db:migrate       # Aplica migrations pendentes (drizzle-kit migrate)
+npm run db:check         # Valida integridade do journal (rodado no CI)
 npm run db:studio        # Abre Drizzle Studio (UI)
 docker compose up -d     # Sobe PostgreSQL + RabbitMQ
 ```
+
+> `db:push` foi removido propositalmente — não use. Ele sincroniza o schema direto no banco sem gerar migration, o que quebra o controle de versões. Ver seção **Migrations**.
 
 ## Arquitetura
 
@@ -64,6 +66,7 @@ src/
 | `@match` | match | Core | Match inteligente + triagem por estilo de vida |
 | `@adoption` | adoption | Core | Pipeline de adoção (solicitações, aprovações) |
 | `@chat` | chat | Supporting | Chat integrado adotante ↔ protetor/ONG |
+| `@reports` | reports | Supporting | Dashboard de KPIs/métricas pra ONGs e protetores |
 | `@timeline` | timeline | Supporting | Fotos e atualizações pós-adoção |
 | `@geo` | geo | Generic | Mapa de feiras e pontos de adoção |
 | `@notifications` | notifications | Generic | Push e email |
@@ -193,6 +196,49 @@ Serviço global em `src/shared/infra/database/drizzle.service.ts`. Ao criar novo
 - Usa `DATABASE_URL` como connection string (não campos separados)
 - Migrations ficam em `src/shared/infra/database/drizzle/`
 - Config em `drizzle.config.ts` com glob `./src/modules/**/infra/schemas/*.ts`
+
+## Migrations
+
+Source-of-truth são os **schemas TypeScript** em `src/modules/<modulo>/infra/schemas/*.ts`. As migrations SQL são **geradas pelo drizzle-kit** a partir desses schemas — não escrevemos SQL à mão.
+
+### Workflow para mudar o banco
+
+1. Editar o `*.schema.ts` correspondente
+2. Rodar `npm run db:generate` → cria novo arquivo `NNNN_xxx.sql` em `src/shared/infra/database/drizzle/` + atualiza `meta/_journal.json`
+3. **Revisar o SQL gerado** — drizzle às vezes inclui DROPs ou ALTERs inesperados
+4. Aplicar localmente: `npm run db:migrate`
+5. Commit do schema TS + arquivo SQL + meta/ junto
+6. Em produção, o entrypoint do container roda `drizzle-kit migrate` automaticamente
+
+### Política de PR (CRÍTICO — evita corrupção do journal)
+
+- **1 PR com migration aberto por vez.** Se já existe um PR ativo com migration, o próximo espera ele ser mergeado antes de criar o seu.
+- Em caso de conflito no `_journal.json` durante rebase/merge:
+  1. Deletar `meta/_journal.json` e `meta/*_snapshot.json`
+  2. Deletar todos os arquivos `*.sql` adicionados pelo seu branch
+  3. Rodar `npm run db:generate` de novo a partir do main atualizado
+  4. Commitar a regeração
+- CI roda `npm run db:check` em todo PR — falha se journal estiver inconsistente
+- PR template (`.github/pull_request_template.md`) inclui checklist de migration
+
+### Histórico
+
+Em maio/2026 o journal foi corrompido por merges paralelos de PRs que rodaram `db:generate` em branches diferentes — o git concatenou as entries gerando `idx` duplicados, migrations duplicadas (`0003_volatile_garia` vs `0005_adoption_requests`) e uma migration auto-gerada errada (`0006_match_questionario`) que recriava tabelas existentes. Foi resolvido por **reset baseline**: deletamos todas as migrations e regeramos uma única `0000_baseline.sql` a partir do estado atual dos schemas TS. A partir daí, o workflow acima passou a vigorar.
+
+### Bootstrap em ambientes pré-existentes
+
+Se um ambiente já tem o schema aplicado mas a tabela `drizzle.__drizzle_migrations` está vazia ou desatualizada, é preciso registrar manualmente as migrations já aplicadas:
+
+```bash
+# Local (extrai hashes do journal)
+npx ts-node ./scripts/print-migration-hashes.ts
+```
+
+E executar o `INSERT ... ON CONFLICT DO NOTHING` impresso na tabela `drizzle.__drizzle_migrations` do ambiente alvo. Isso evita que o `drizzle-kit migrate` tente reaplicar migrations cujo SQL já foi executado.
+
+### Tabelas legacy fora do controle do Drizzle
+
+Em maio/2026 o banco de produção tinha 3 tabelas que **não têm schema TS** correspondente: `fotos_pets`, `mensagens_chat`, `feiras_adocao`. O `drizzle-kit generate` não as enxerga (e portanto não gera drops nem alters). Elas continuam existindo no banco como código-zumbi. Decisão futura (não agora): ou criar schemas TS pra elas (assumir como ativas) ou dropá-las explicitamente.
 
 ## Regras de desacoplamento
 

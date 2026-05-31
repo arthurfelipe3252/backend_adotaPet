@@ -12,15 +12,19 @@ import {
 export class DrizzleMessageRepository implements MessageRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
-  async create(message: Message): Promise<void> {
-    await this.drizzle.db.insert(messagesSchema).values({
-      conversationId: message.conversationId,
-      senderId: message.senderId,
-      content: message.content,
-      isRead: message.isRead,
-      createdAt: message.createdAt ?? new Date(),
-      updatedAt: message.updatedAt ?? new Date(),
-    });
+  async create(message: Message): Promise<Message> {
+    const [row] = await this.drizzle.db
+      .insert(messagesSchema)
+      .values({
+        conversationId: message.conversationId,
+        senderId: message.senderId,
+        content: message.content,
+        isRead: message.isRead,
+        createdAt: message.createdAt ?? new Date(),
+        updatedAt: message.updatedAt ?? new Date(),
+      })
+      .returning();
+    return this.toEntity(row)!;
   }
 
   async update(message: Message): Promise<void> {

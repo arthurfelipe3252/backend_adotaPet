@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -14,7 +7,6 @@ import {
 } from '@nestjs/swagger';
 import type { AuthenticatedUser } from '@identity/usuarios/infra/auth/types/authenticated-user.type';
 import { CurrentUser } from '@identity/usuarios/infra/decorators/current-user.decorator';
-import { JwtAuthGuard } from '@identity/usuarios/infra/guards/jwt-auth.guard';
 import {
   DashboardQueryDto,
   FunnelQueryDto,
@@ -46,7 +38,6 @@ import { DashboardService } from '@reports/reporting-dashboard/application/servi
  */
 @ApiTags('Reports')
 @ApiBearerAuth('access-token')
-@UseGuards(JwtAuthGuard)
 @Controller('reports/dashboard')
 export class ReportsController {
   constructor(private readonly dashboardService: DashboardService) {}

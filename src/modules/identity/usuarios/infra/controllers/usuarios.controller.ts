@@ -8,7 +8,6 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -24,7 +23,6 @@ import { UsuarioResponseDto } from '@identity/usuarios/application/dto/usuario-r
 import { UsuarioService } from '@identity/usuarios/application/services/usuario.service';
 import type { AuthenticatedUser } from '@identity/usuarios/infra/auth/types/authenticated-user.type';
 import { CurrentUser } from '@identity/usuarios/infra/decorators/current-user.decorator';
-import { JwtAuthGuard } from '@identity/usuarios/infra/guards/jwt-auth.guard';
 
 /**
  * Endpoints de gestão do usuário-mãe.
@@ -45,7 +43,6 @@ export class UsuariosController {
   // do Express interpreta "me" como :id.
   // ----------------------------------------------------------------
   @Get('me')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Retorna o perfil do usuário autenticado',
@@ -67,7 +64,6 @@ export class UsuariosController {
   // Também precisa vir antes de PATCH /users/:id pelo mesmo motivo.
   // ----------------------------------------------------------------
   @Patch('me/password')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Altera a senha do usuário autenticado',
@@ -97,7 +93,6 @@ export class UsuariosController {
   // campos filtrados" (ex: ONG visível pro adotante).
   // ----------------------------------------------------------------
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Retorna os dados de um usuário pelo identificador',
@@ -129,7 +124,6 @@ export class UsuariosController {
   // PATCH /users/:id
   // ----------------------------------------------------------------
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Atualiza dados básicos do usuário (nome, telefone)',
@@ -161,7 +155,6 @@ export class UsuariosController {
   // DELETE /users/:id — soft delete
   // ----------------------------------------------------------------
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth('access-token')
   @ApiOperation({

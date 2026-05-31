@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -12,7 +12,7 @@ import { ProtetorOngResponseDto } from '@identity/protetores_ongs/application/dt
 import { ProtetorOngService } from '@identity/protetores_ongs/application/services/protetor-ong.service';
 import type { AuthenticatedUser } from '@identity/usuarios/infra/auth/types/authenticated-user.type';
 import { CurrentUser } from '@identity/usuarios/infra/decorators/current-user.decorator';
-import { JwtAuthGuard } from '@identity/usuarios/infra/guards/jwt-auth.guard';
+import { Public } from '@identity/usuarios/infra/decorators/public.decorator';
 
 @ApiTags('Protetores e ONGs')
 @Controller('users/protetores-ongs')
@@ -23,6 +23,7 @@ export class ProtetoresOngsController {
   // POST /users/protetores-ongs — registro atômico (público)
   // ----------------------------------------------------------------
   @Post()
+  @Public()
   @ApiOperation({
     summary: 'Cadastra um novo protetor (PF) ou ONG (PJ)',
     description:
@@ -49,13 +50,9 @@ export class ProtetoresOngsController {
   }
 
   // ----------------------------------------------------------------
-  // GET /users/protetores-ongs/me — perfil completo do protetor/ong
-  //
-  // O id vem sempre do JWT — não há /:id para impedir vazamento de
-  // perfil de outro protetor/ong por enumeração.
+  // GET /users/protetores-ongs/me
   // ----------------------------------------------------------------
   @Get('me')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Retorna o perfil completo do protetor/ong autenticado',
@@ -84,18 +81,9 @@ export class ProtetoresOngsController {
   }
 
   // ----------------------------------------------------------------
-  // PATCH /users/protetores-ongs/me — atualiza perfil completo
-  //
-  // Aceita combinação livre de:
-  //  - dados do usuário-mãe (nome, email, telefone)
-  //  - dados do protetor/ong (descricao, telefoneContato, imagemBase64,
-  //    documentoComprobatorio)
-  //  - endereço            (cria, atualiza ou desvincula com null)
-  //
-  // Imutáveis: cpfCnpj, tipoUsuario (não muda PF↔PJ), senha.
+  // PATCH /users/protetores-ongs/me
   // ----------------------------------------------------------------
   @Patch('me')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Atualiza o perfil do protetor/ong autenticado',

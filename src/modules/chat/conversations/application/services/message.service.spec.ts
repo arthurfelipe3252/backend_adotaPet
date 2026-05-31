@@ -1,11 +1,16 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { MessageService } from '@chat/conversations/application/services/message.service';
 import { Message } from '@chat/conversations/domain/models/message.entity';
 import { Conversation } from '@chat/conversations/domain/models/conversation.entity';
+import type { AdotanteRepository } from '@identity/adotantes/domain/repositories/adotante-repository.interface';
+import type { ProtetorOngRepository } from '@identity/protetores_ongs/domain/repositories/protetor-ong-repository.interface';
+import { TipoUsuario } from '@identity/usuarios/domain/enums/tipo-usuario.enum';
 
 const conversationId = '11111111-1111-1111-1111-111111111111';
 const adopterId = '22222222-2222-2222-2222-222222222222';
 const protetorId = '33333333-3333-3333-3333-333333333333';
+const adopterUsuarioId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+const outroAdopterUsuarioId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
 
 const buildConversation = () =>
   Conversation.restore({
@@ -34,18 +39,44 @@ describe('MessageService', () => {
     findByParticipant: jest.fn(),
   };
 
-  const service = new MessageService(messageRepository, conversationRepository);
+  const adotanteRepository = {
+    buscarPorUsuarioId: jest.fn(),
+    findSummariesByIds: jest.fn(),
+  };
+
+  const protetorRepository = {
+    buscarPorUsuarioId: jest.fn(),
+    findSummariesByIds: jest.fn(),
+  };
+
+  const service = new MessageService(
+    messageRepository,
+    conversationRepository,
+    adotanteRepository as unknown as AdotanteRepository,
+    protetorRepository as unknown as ProtetorOngRepository,
+  );
 
   beforeEach(() => {
     jest.clearAllMocks();
+    adotanteRepository.buscarPorUsuarioId.mockImplementation((usuarioId) => {
+      if (usuarioId === adopterUsuarioId) return { id: adopterId };
+      if (usuarioId === outroAdopterUsuarioId)
+        return { id: '99999999-9999-9999-9999-999999999999' };
+      return null;
+    });
+    adotanteRepository.findSummariesByIds.mockImplementation((ids: string[]) =>
+      ids.includes(adopterId) ? [{ id: adopterId, nome: 'João' }] : [],
+    );
+    protetorRepository.findSummariesByIds.mockImplementation((ids: string[]) =>
+      ids.includes(protetorId) ? [{ id: protetorId, nome: 'ONG Bicho' }] : [],
+    );
   });
 
   it('throws when conversation is missing', async () => {
     conversationRepository.findById.mockResolvedValue(null);
 
     await expect(
-      service.create(conversationId, {
-        senderId: adopterId,
+      service.create(conversationId, adopterUsuarioId, TipoUsuario.Adotante, {
         content: 'Oi',
       }),
     ).rejects.toBeInstanceOf(NotFoundException);
@@ -55,20 +86,36 @@ describe('MessageService', () => {
     conversationRepository.findById.mockResolvedValue(buildConversation());
 
     await expect(
-      service.create(conversationId, {
-        senderId: '99999999-9999-9999-9999-999999999999',
-        content: 'Oi',
-      }),
-    ).rejects.toBeInstanceOf(BadRequestException);
+      service.create(
+        conversationId,
+        outroAdopterUsuarioId,
+        TipoUsuario.Adotante,
+        { content: 'Oi' },
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('creates a message and updates the conversation', async () => {
     conversationRepository.findById.mockResolvedValue(buildConversation());
+    // create agora retorna a entidade reidratada com id do banco
+    messageRepository.create.mockImplementation((msg: Message) =>
+      Message.restore({
+        id: '88888888-8888-8888-8888-888888888888',
+        conversationId: msg.conversationId,
+        senderId: msg.senderId,
+        content: msg.content,
+        isRead: msg.isRead,
+        createdAt: msg.createdAt ?? new Date(),
+        updatedAt: msg.updatedAt ?? new Date(),
+      }),
+    );
 
-    const result = await service.create(conversationId, {
-      senderId: adopterId,
-      content: 'Mensagem teste',
-    });
+    const result = await service.create(
+      conversationId,
+      adopterUsuarioId,
+      TipoUsuario.Adotante,
+      { content: 'Mensagem teste' },
+    );
 
     expect(messageRepository.create).toHaveBeenCalledTimes(1);
     expect(conversationRepository.update).toHaveBeenCalledTimes(1);
@@ -96,10 +143,12 @@ describe('MessageService', () => {
 
     messageRepository.findByConversation.mockResolvedValue([message]);
 
-    const result = await service.findByConversation(conversationId, {
-      limit: 10,
-      offset: 0,
-    });
+    const result = await service.findByConversation(
+      conversationId,
+      adopterUsuarioId,
+      TipoUsuario.Adotante,
+      { limit: 10, offset: 0 },
+    );
 
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
@@ -115,7 +164,12 @@ describe('MessageService', () => {
     conversationRepository.findById.mockResolvedValue(null);
 
     await expect(
-      service.findByConversation(conversationId, {}),
+      service.findByConversation(
+        conversationId,
+        adopterUsuarioId,
+        TipoUsuario.Adotante,
+        {},
+      ),
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
@@ -131,10 +185,14 @@ describe('MessageService', () => {
     })!;
 
     messageRepository.findById.mockResolvedValue(message);
+    conversationRepository.findById.mockResolvedValue(buildConversation());
 
-    const result = await service.updateReadStatus(message.id!, {
-      isRead: true,
-    });
+    const result = await service.updateReadStatus(
+      message.id!,
+      adopterUsuarioId,
+      TipoUsuario.Adotante,
+      { isRead: true },
+    );
 
     expect(messageRepository.update).toHaveBeenCalledTimes(1);
     expect(result).toMatchObject({
@@ -147,9 +205,12 @@ describe('MessageService', () => {
     messageRepository.findById.mockResolvedValue(null);
 
     await expect(
-      service.updateReadStatus('77777777-7777-7777-7777-777777777777', {
-        isRead: true,
-      }),
+      service.updateReadStatus(
+        '77777777-7777-7777-7777-777777777777',
+        adopterUsuarioId,
+        TipoUsuario.Adotante,
+        { isRead: true },
+      ),
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 });

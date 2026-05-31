@@ -35,6 +35,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Valida integridade do _journal.json + meta/ das migrations.
+      # Pega merges paralelos que corrompem o journal (causou desastre
+      # em maio/2026 — ver CLAUDE.md > Migrations).
+      - name: Check migrations
+        run: npm run db:check
+
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:

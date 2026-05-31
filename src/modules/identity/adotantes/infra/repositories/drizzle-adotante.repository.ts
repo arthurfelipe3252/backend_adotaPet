@@ -1,13 +1,17 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { DrizzleService } from '@shared/infra/database/drizzle.service';
 import type { DbExecutor } from '@shared/infra/database/types';
 import { Adotante } from '@identity/adotantes/domain/models/adotante.entity';
-import { AdotanteRepository } from '@identity/adotantes/domain/repositories/adotante-repository.interface';
+import {
+  AdotanteRepository,
+  type AdotanteSummary,
+} from '@identity/adotantes/domain/repositories/adotante-repository.interface';
 import {
   adotantesSchema,
   AdotanteRow,
 } from '@identity/adotantes/infra/schemas/adotantes.schema';
+import { usuariosSchema } from '@identity/usuarios/infra/schemas/usuarios.schema';
 
 @Injectable()
 export class DrizzleAdotanteRepository implements AdotanteRepository {
@@ -53,6 +57,21 @@ export class DrizzleAdotanteRepository implements AdotanteRepository {
       .where(eq(adotantesSchema.usuarioId, usuarioId))
       .limit(1);
     return Adotante.restaurar(row ? this.paraDominio(row) : null);
+  }
+
+  async findSummariesByIds(ids: string[]): Promise<AdotanteSummary[]> {
+    if (ids.length === 0) return [];
+    return this.drizzle.db
+      .select({
+        id: adotantesSchema.id,
+        nome: usuariosSchema.nome,
+      })
+      .from(adotantesSchema)
+      .innerJoin(
+        usuariosSchema,
+        eq(adotantesSchema.usuarioId, usuariosSchema.id),
+      )
+      .where(inArray(adotantesSchema.id, ids));
   }
 
   async atualizar(

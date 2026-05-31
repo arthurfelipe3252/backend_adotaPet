@@ -1,13 +1,17 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { DrizzleService } from '@shared/infra/database/drizzle.service';
 import type { DbExecutor } from '@shared/infra/database/types';
 import { ProtetorOng } from '@identity/protetores_ongs/domain/models/protetor-ong.entity';
-import { ProtetorOngRepository } from '@identity/protetores_ongs/domain/repositories/protetor-ong-repository.interface';
+import {
+  ProtetorOngRepository,
+  type ProtetorOngSummary,
+} from '@identity/protetores_ongs/domain/repositories/protetor-ong-repository.interface';
 import {
   protetoresOngsSchema,
   ProtetorOngRow,
 } from '@identity/protetores_ongs/infra/schemas/protetores-ongs.schema';
+import { usuariosSchema } from '@identity/usuarios/infra/schemas/usuarios.schema';
 
 @Injectable()
 export class DrizzleProtetorOngRepository implements ProtetorOngRepository {
@@ -56,6 +60,21 @@ export class DrizzleProtetorOngRepository implements ProtetorOngRepository {
       .where(eq(protetoresOngsSchema.usuarioId, usuarioId))
       .limit(1);
     return ProtetorOng.restaurar(row ? this.paraDominio(row) : null);
+  }
+
+  async findSummariesByIds(ids: string[]): Promise<ProtetorOngSummary[]> {
+    if (ids.length === 0) return [];
+    return this.drizzle.db
+      .select({
+        id: protetoresOngsSchema.id,
+        nome: usuariosSchema.nome,
+      })
+      .from(protetoresOngsSchema)
+      .innerJoin(
+        usuariosSchema,
+        eq(protetoresOngsSchema.usuarioId, usuariosSchema.id),
+      )
+      .where(inArray(protetoresOngsSchema.id, ids));
   }
 
   async atualizar(

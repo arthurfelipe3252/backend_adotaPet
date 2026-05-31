@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Public } from '@identity/usuarios/infra/decorators/public.decorator';
 
 /**
  * Endpoint de liveness usado pelo HEALTHCHECK do Docker e pelo Easypanel.
@@ -14,6 +15,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 @Controller('health')
 export class HealthController {
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Liveness probe — usado pelo Docker/Easypanel' })
   @ApiResponse({ status: 200, description: 'Aplicação em pé' })
   check() {

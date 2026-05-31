@@ -54,7 +54,15 @@
       "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' npx ts-node *)",
       "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' JWT_SECRET='R2FyYW50aXIgZSBwcm90ZWdlcg==' JWT_ACCESS_EXPIRES_IN='1d' JWT_REFRESH_EXPIRES_IN='7d' BCRYPT_SALT_ROUNDS='12' PORT='3000' npm run *)",
       "PowerShell(Get-NetTCPConnection *)",
-      "PowerShell(npm run *)"
+      "PowerShell(npm run *)",
+      "Bash(rm -v 0003_volatile_garia.sql)",
+      "Bash(rm -v 0006_match_questionario.sql)",
+      "Bash(mv -v 0006_curious_vivisector.sql 0006_add_protetor_id_to_adoption_requests.sql)",
+      "Bash(rm -rfv meta/)",
+      "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' npx drizzle-kit generate --name=baseline)",
+      "Bash(npx ts-node *)",
+      "Bash(npm test *)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }
