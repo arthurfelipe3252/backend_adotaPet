@@ -97,8 +97,8 @@ export class AdoptionRequestService {
       status: 'received',
     });
 
-    await this.repository.create(request);
-    return this.toResponseSingle(request);
+    const created = await this.repository.create(request);
+    return this.toResponseSingle(created);
   }
 
   async findAll(

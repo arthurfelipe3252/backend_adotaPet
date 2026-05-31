@@ -92,11 +92,11 @@ export class MessageService {
       isRead: false,
     });
 
-    await this.messageRepository.create(message);
+    const created = await this.messageRepository.create(message);
     conversation.touch(new Date());
     await this.conversationRepository.update(conversation);
 
-    return this.toResponseSingle(message, conversation);
+    return this.toResponseSingle(created, conversation);
   }
 
   async findByConversation(

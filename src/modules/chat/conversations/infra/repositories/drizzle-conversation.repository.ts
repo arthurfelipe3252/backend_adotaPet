@@ -12,15 +12,19 @@ import { ConversationRepository } from '@chat/conversations/domain/repositories/
 export class DrizzleConversationRepository implements ConversationRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
-  async create(conversation: Conversation): Promise<void> {
-    await this.drizzle.db.insert(conversationsSchema).values({
-      adoptionRequestId: conversation.adoptionRequestId,
-      adopterId: conversation.adopterId,
-      protetorId: conversation.protetorId,
-      isActive: conversation.isActive,
-      createdAt: conversation.createdAt ?? new Date(),
-      updatedAt: conversation.updatedAt ?? new Date(),
-    });
+  async create(conversation: Conversation): Promise<Conversation> {
+    const [row] = await this.drizzle.db
+      .insert(conversationsSchema)
+      .values({
+        adoptionRequestId: conversation.adoptionRequestId,
+        adopterId: conversation.adopterId,
+        protetorId: conversation.protetorId,
+        isActive: conversation.isActive,
+        createdAt: conversation.createdAt ?? new Date(),
+        updatedAt: conversation.updatedAt ?? new Date(),
+      })
+      .returning();
+    return this.toEntity(row)!;
   }
 
   async update(conversation: Conversation): Promise<void> {

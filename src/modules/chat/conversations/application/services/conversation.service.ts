@@ -102,8 +102,8 @@ export class ConversationService {
       isActive: true,
     });
 
-    await this.repository.create(conversation);
-    return this.toResponseSingle(conversation);
+    const created = await this.repository.create(conversation);
+    return this.toResponseSingle(created);
   }
 
   async findAll(

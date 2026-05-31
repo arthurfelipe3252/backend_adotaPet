@@ -18,19 +18,23 @@ type AdoptionRequestRecord = typeof adoptionRequestsSchema.$inferSelect;
 export class DrizzleAdoptionRequestRepository implements AdoptionRequestRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
-  async create(request: AdoptionRequest): Promise<void> {
-    await this.drizzle.db.insert(adoptionRequestsSchema).values({
-      petId: request.petId,
-      protetorId: request.protetorId ?? null,
-      adopterId: request.adopterId,
-      status: request.status,
-      preTriageStatus: request.preTriageStatus,
-      matchScore: request.matchScore ?? null,
-      matchAnswers: request.matchAnswers ?? null,
-      notes: request.notes ?? null,
-      createdAt: request.createdAt ?? new Date(),
-      updatedAt: request.updatedAt ?? new Date(),
-    });
+  async create(request: AdoptionRequest): Promise<AdoptionRequest> {
+    const [row] = await this.drizzle.db
+      .insert(adoptionRequestsSchema)
+      .values({
+        petId: request.petId,
+        protetorId: request.protetorId ?? null,
+        adopterId: request.adopterId,
+        status: request.status,
+        preTriageStatus: request.preTriageStatus,
+        matchScore: request.matchScore ?? null,
+        matchAnswers: request.matchAnswers ?? null,
+        notes: request.notes ?? null,
+        createdAt: request.createdAt ?? new Date(),
+        updatedAt: request.updatedAt ?? new Date(),
+      })
+      .returning();
+    return this.mapToEntity(row)!;
   }
 
   async update(request: AdoptionRequest): Promise<void> {

@@ -98,6 +98,18 @@ describe('MessageService', () => {
 
   it('creates a message and updates the conversation', async () => {
     conversationRepository.findById.mockResolvedValue(buildConversation());
+    // create agora retorna a entidade reidratada com id do banco
+    messageRepository.create.mockImplementation((msg) =>
+      Message.restore({
+        id: '88888888-8888-8888-8888-888888888888',
+        conversationId: msg.conversationId,
+        senderId: msg.senderId,
+        content: msg.content,
+        isRead: msg.isRead,
+        createdAt: msg.createdAt ?? new Date(),
+        updatedAt: msg.updatedAt ?? new Date(),
+      }),
+    );
 
     const result = await service.create(
       conversationId,
