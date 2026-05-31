@@ -1,0 +1,211 @@
+{
+  "kpis": {
+    "petsDisponivel": 12,
+    "petsEmProcesso": 8,
+    "petsAdotadoTotal": 10,
+    "petsAdotadoMesAtual": 6,
+    "solicitacoesPendentes": 54,
+    "conversasAtivas": 6,
+    "mensagensNaoLidas": 12,
+    "taxaConversaoPct": 22.89,
+    "tempoMedioAdocaoDias": 56.82
+  },
+  "adoptionsTimeline": [
+    {
+      "monthStart": "2025-06-01T00:00:00.000Z",
+      "count": 1
+    },
+    {
+      "monthStart": "2025-07-01T00:00:00.000Z",
+      "count": 1
+    },
+    {
+      "monthStart": "2025-08-01T00:00:00.000Z",
+      "count": 1
+    },
+    {
+      "monthStart": "2025-09-01T00:00:00.000Z",
+      "count": 1
+    },
+    {
+      "monthStart": "2025-10-01T00:00:00.000Z",
+      "count": 1
+    },
+    {
+      "monthStart": "2025-11-01T00:00:00.000Z",
+      "count": 2
+    },
+    {
+      "monthStart": "2025-12-01T00:00:00.000Z",
+      "count": 1
+    },
+    {
+      "monthStart": "2026-01-01T00:00:00.000Z",
+      "count": 1
+    },
+    {
+      "monthStart": "2026-02-01T00:00:00.000Z",
+      "count": 2
+    },
+    {
+      "monthStart": "2026-03-01T00:00:00.000Z",
+      "count": 1
+    },
+    {
+      "monthStart": "2026-04-01T00:00:00.000Z",
+      "count": 1
+    },
+    {
+      "monthStart": "2026-05-01T00:00:00.000Z",
+      "count": 6
+    }
+  ],
+  "requestsTimeline": [
+    {
+      "monthStart": "2025-06-01T00:00:00.000Z",
+      "count": 4
+    },
+    {
+      "monthStart": "2025-07-01T00:00:00.000Z",
+      "count": 6
+    },
+    {
+      "monthStart": "2025-08-01T00:00:00.000Z",
+      "count": 10
+    },
+    {
+      "monthStart": "2025-09-01T00:00:00.000Z",
+      "count": 5
+    },
+    {
+      "monthStart": "2025-10-01T00:00:00.000Z",
+      "count": 7
+    },
+    {
+      "monthStart": "2025-11-01T00:00:00.000Z",
+      "count": 9
+    },
+    {
+      "monthStart": "2025-12-01T00:00:00.000Z",
+      "count": 5
+    },
+    {
+      "monthStart": "2026-01-01T00:00:00.000Z",
+      "count": 6
+    },
+    {
+      "monthStart": "2026-02-01T00:00:00.000Z",
+      "count": 10
+    },
+    {
+      "monthStart": "2026-03-01T00:00:00.000Z",
+      "count": 4
+    },
+    {
+      "monthStart": "2026-04-01T00:00:00.000Z",
+      "count": 7
+    },
+    {
+      "monthStart": "2026-05-01T00:00:00.000Z",
+      "count": 10
+    }
+  ],
+  "funnel": {
+    "received": 28,
+    "inAnalysis": 26,
+    "approved": 19,
+    "rejected": 10
+  },
+  "topPets": [
+    {
+      "petId": "4c249059-7760-4eaa-8358-7276556fa693",
+      "nome": "Thor",
+      "especie": "cao",
+      "porte": "pequeno",
+      "status": "disponivel",
+      "totalRequests": 10
+    },
+    {
+      "petId": "5d25405c-be26-4b83-87f4-525a37e7ed74",
+      "nome": "Mel",
+      "especie": "gato",
+      "porte": "medio",
+      "status": "disponivel",
+      "totalRequests": 9
+    },
+    {
+      "petId": "9177ee65-e264-460a-91e5-b137a57cf936",
+      "nome": "Bob",
+      "especie": "outro",
+      "porte": "grande",
+      "status": "disponivel",
+      "totalRequests": 8
+    },
+    {
+      "petId": "348b1834-7641-4c5d-89ff-9b3e5dc9e113",
+      "nome": "Luna",
+      "especie": "cao",
+      "porte": "pequeno",
+      "status": "disponivel",
+      "totalRequests": 7
+    },
+    {
+      "petId": "3edf9e2b-b55b-4c16-a0b7-7d5b8c0dafe8",
+      "nome": "Max",
+      "especie": "gato",
+      "porte": "medio",
+      "status": "disponivel",
+      "totalRequests": 6
+    }
+  ],
+  "stalePets": [
+    {
+      "id": "5d25405c-be26-4b83-87f4-525a37e7ed74",
+      "nome": "Mel",
+      "especie": "gato",
+      "porte": "medio",
+      "createdAt": "2025-06-02T12:00:00.000Z",
+      "diasNoCatalogo": 360
+    },
+    {
+      "id": "750c6d53-5b90-4f77-89c1-82ef65a54aff",
+      "nome": "Toby",
+      "especie": "cao",
+      "porte": "pequeno",
+      "createdAt": "2025-11-07T12:00:00.000Z",
+      "diasNoCatalogo": 202
+    },
+    {
+      "id": "7f8332a8-b14e-4382-8646-89311fe7548c",
+      "nome": "Nina",
+      "especie": "outro",
+      "porte": "grande",
+      "createdAt": "2025-12-06T12:00:00.000Z",
+      "diasNoCatalogo": 173
+    },
+    {
+      "id": "8f66133a-3569-4b50-a8a1-834d56bbb6be",
+      "nome": "Amora",
+      "especie": "outro",
+      "porte": "grande",
+      "createdAt": "2026-01-12T12:00:00.000Z",
+      "diasNoCatalogo": 136
+    },
+    {
+      "id": "a5946ac6-662f-48e8-b5af-a26f04d97c9f",
+      "nome": "Zeus",
+      "especie": "gato",
+      "porte": "medio",
+      "createdAt": "2026-02-11T12:00:00.000Z",
+      "diasNoCatalogo": 106
+    },
+    {
+      "id": "7ed9e837-154d-4ddd-9653-c4abd54cee5c",
+      "nome": "Pipoca",
+      "especie": "cao",
+      "porte": "pequeno",
+      "createdAt": "2026-03-10T12:00:00.000Z",
+      "diasNoCatalogo": 79
+    }
+  ]
+}

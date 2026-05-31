@@ -57,8 +57,9 @@ export class ProtetorOngService {
       throw new ConflictException('Email já cadastrado');
     }
 
-    const cpfCnpjJaUsado =
-      await this.protetorOngRepository.buscarPorCpfCnpj(dto.cpfCnpj);
+    const cpfCnpjJaUsado = await this.protetorOngRepository.buscarPorCpfCnpj(
+      dto.cpfCnpj,
+    );
     if (cpfCnpjJaUsado) {
       throw new ConflictException('CPF/CNPJ já cadastrado');
     }
@@ -194,7 +195,8 @@ export class ProtetorOngService {
       throw new NotFoundException('Perfil de protetor/ong não encontrado');
     }
 
-    const usuarioAtual = await this.usuarioRepository.buscarPorId(autenticadoId);
+    const usuarioAtual =
+      await this.usuarioRepository.buscarPorId(autenticadoId);
     if (!usuarioAtual) {
       throw new NotFoundException('Usuário não encontrado');
     }
@@ -241,7 +243,8 @@ export class ProtetorOngService {
       );
 
       // ── Protetor/ONG (sem documentoComprobatorio — imutável) ────────
-      if (dto.descricao !== undefined) protetorAtual.withDescricao(dto.descricao);
+      if (dto.descricao !== undefined)
+        protetorAtual.withDescricao(dto.descricao);
       if (dto.telefoneContato !== undefined)
         protetorAtual.withTelefoneContato(dto.telefoneContato);
       if (dto.imagemBase64 !== undefined)

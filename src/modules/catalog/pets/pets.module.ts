@@ -1,9 +1,9 @@
-import { Module } from "@nestjs/common";
-import { SharedModule } from "@shared/shared.module";
-import { PetService } from "./application/services/pet.service";
-import { DrizzlePetRepository } from "./infra/repositories/drizzle-pet.repository";
-import { PetsController } from "./infra/controllers/pets.controller";
-import { PET_REPOSITORY } from "./domain/repositories/pet-repository.interface";
+import { Module } from '@nestjs/common';
+import { SharedModule } from '@shared/shared.module';
+import { PetService } from './application/services/pet.service';
+import { DrizzlePetRepository } from './infra/repositories/drizzle-pet.repository';
+import { PetsController } from './infra/controllers/pets.controller';
+import { PET_REPOSITORY } from './domain/repositories/pet-repository.interface';
 
 @Module({
   imports: [SharedModule],
@@ -16,6 +16,6 @@ import { PET_REPOSITORY } from "./domain/repositories/pet-repository.interface";
       useExisting: DrizzlePetRepository,
     },
   ],
-  exports: [PetService],
+  exports: [PetService, PET_REPOSITORY, DrizzlePetRepository],
 })
 export class PetsModule {}
