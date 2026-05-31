@@ -1,13 +1,13 @@
-import { Injectable } from "@nestjs/common";
-import { eq } from "drizzle-orm";
-import { DrizzleService } from "@shared/infra/database/drizzle.service";
-import { adoptionRequestsSchema } from "@adoption/adoption-requests/infra/schemas/adoption-requests.schema";
+import { Injectable } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
+import { DrizzleService } from '@shared/infra/database/drizzle.service';
+import { adoptionRequestsSchema } from '@adoption/adoption-requests/infra/schemas/adoption-requests.schema';
 import {
   AdoptionRequest,
   type AdoptionPreTriageStatus,
   type AdoptionRequestStatus,
-} from "@adoption/adoption-requests/domain/models/adoption-request.entity";
-import { type AdoptionRequestRepository } from "@adoption/adoption-requests/domain/repositories/adoption-request-repository.interface";
+} from '@adoption/adoption-requests/domain/models/adoption-request.entity';
+import { type AdoptionRequestRepository } from '@adoption/adoption-requests/domain/repositories/adoption-request-repository.interface';
 
 type AdoptionRequestRecord = typeof adoptionRequestsSchema.$inferSelect;
 
@@ -18,6 +18,7 @@ export class DrizzleAdoptionRequestRepository implements AdoptionRequestReposito
   async create(request: AdoptionRequest): Promise<void> {
     await this.drizzle.db.insert(adoptionRequestsSchema).values({
       petId: request.petId,
+      protetorId: request.protetorId ?? null,
       adopterId: request.adopterId,
       status: request.status,
       preTriageStatus: request.preTriageStatus,
@@ -40,6 +41,7 @@ export class DrizzleAdoptionRequestRepository implements AdoptionRequestReposito
         matchScore: request.matchScore ?? null,
         matchAnswers: request.matchAnswers ?? null,
         notes: request.notes ?? null,
+        protetorId: request.protetorId ?? null,
         updatedAt: request.updatedAt ?? new Date(),
       })
       .where(eq(adoptionRequestsSchema.id, request.id));
@@ -73,11 +75,15 @@ export class DrizzleAdoptionRequestRepository implements AdoptionRequestReposito
     return AdoptionRequest.restore({
       id: record.id,
       petId: record.petId,
+      protetorId: record.protetorId,
       adopterId: record.adopterId,
       status: record.status as AdoptionRequestStatus,
       preTriageStatus: record.preTriageStatus as AdoptionPreTriageStatus,
       matchScore: record.matchScore,
-      matchAnswers: record.matchAnswers as Record<string, string | number | boolean | null> | null,
+      matchAnswers: record.matchAnswers as Record<
+        string,
+        string | number | boolean | null
+      > | null,
       notes: record.notes,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,

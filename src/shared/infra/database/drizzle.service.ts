@@ -9,6 +9,9 @@ import { protetoresOngsSchema } from '@identity/protetores_ongs/infra/schemas/pr
 import { refreshTokensSchema } from '@identity/usuarios/infra/schemas/refresh-tokens.schema';
 import { usuariosSchema } from '@identity/usuarios/infra/schemas/usuarios.schema';
 import { adoptionRequestsSchema } from '@adoption/adoption-requests/infra/schemas/adoption-requests.schema';
+import { questionarioMatchSchema } from '@match/questionario/infra/schemas/questionario-match.schema';
+import { conversationsSchema } from '@chat/conversations/infra/schemas/conversations.schema';
+import { messagesSchema } from '@chat/conversations/infra/schemas/messages.schema';
 
 const schema = {
   pets: petsSchema,
@@ -18,6 +21,9 @@ const schema = {
   adotantes: adotantesSchema,
   protetoresOngs: protetoresOngsSchema,
   adoptionRequests: adoptionRequestsSchema,
+  questionarioMatch: questionarioMatchSchema,
+  conversations: conversationsSchema,
+  messages: messagesSchema,
 };
 
 @Injectable()

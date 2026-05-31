@@ -1,19 +1,22 @@
-import { Injectable, Inject, NotFoundException } from "@nestjs/common";
-import { Pet } from "../../domain/models/pet.entity";
-import type { PetFilters, PetRepository } from "../../domain/repositories/pet-repository.interface";
-import { PET_REPOSITORY } from "../../domain/repositories/pet-repository.interface";
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Pet } from '../../domain/models/pet.entity';
+import type {
+  PetFilters,
+  PetRepository,
+} from '../../domain/repositories/pet-repository.interface';
+import { PET_REPOSITORY } from '../../domain/repositories/pet-repository.interface';
 import type {
   CreatePetDto,
   UpdatePetDto,
   PetResponseDto,
-} from "../dto/pet.dto";
+} from '../dto/pet.dto';
 
 @Injectable()
 export class PetService {
   constructor(
     @Inject(PET_REPOSITORY)
     private readonly petRepository: PetRepository,
-  ) { }
+  ) {}
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -70,7 +73,8 @@ export class PetService {
     if (dto.castrado !== undefined) pet.withCastrado(dto.castrado);
     if (dto.vacinado !== undefined) pet.withVacinado(dto.vacinado);
     if (dto.descricao !== undefined) pet.withDescricao(dto.descricao ?? null);
-    if (dto.temperamento !== undefined) pet.withTemperamento(dto.temperamento ?? null);
+    if (dto.temperamento !== undefined)
+      pet.withTemperamento(dto.temperamento ?? null);
     if (dto.status !== undefined) pet.withStatus(dto.status);
     if (dto.fotosUrls !== undefined) pet.withFotosUrls(dto.fotosUrls ?? null);
 

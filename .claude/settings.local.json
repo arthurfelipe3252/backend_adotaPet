@@ -42,7 +42,19 @@
       "Bash(git -C \"C:\\\\E.S\\\\Quinto semestre\\\\projeto\\\\backend_adotaPet\" log --all --graph --oneline)",
       "Bash(git -C \"C:\\\\E.S\\\\Quinto semestre\\\\projeto\\\\backend_adotaPet\" status)",
       "Bash(git -C \"C:\\\\E.S\\\\Quinto semestre\\\\projeto\\\\backend_adotaPet\" show a57582b --stat)",
-      "Bash(git -C \"C:\\\\E.S\\\\Quinto semestre\\\\projeto\\\\backend_adotaPet\" show 80f9b88 --stat)"
+      "Bash(git -C \"C:\\\\E.S\\\\Quinto semestre\\\\projeto\\\\backend_adotaPet\" show 80f9b88 --stat)",
+      "Read(//c/Users/User/.claude/plans/**)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\User\\\\.claude\\\\plans\")",
+      "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' npm run *)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :5432)",
+      "Bash(tasklist /FI \"PID eq 9168\")",
+      "Bash(tasklist /FI \"PID eq 34044\")",
+      "PowerShell(Get-Process *)",
+      "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' npx ts-node *)",
+      "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' JWT_SECRET='R2FyYW50aXIgZSBwcm90ZWdlcg==' JWT_ACCESS_EXPIRES_IN='1d' JWT_REFRESH_EXPIRES_IN='7d' BCRYPT_SALT_ROUNDS='12' PORT='3000' npm run *)",
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell(npm run *)"
     ]
   }
 }

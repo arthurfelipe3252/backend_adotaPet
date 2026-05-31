@@ -13,6 +13,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "ignoreDeprecations": "5.0",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -50,6 +51,9 @@
       ],
       "@payments/*": [
         "src/modules/payments/*"
+      ],
+      "@reports/*": [
+        "src/modules/reports/*"
       ]
     }
   }
