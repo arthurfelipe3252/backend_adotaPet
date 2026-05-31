@@ -9,7 +9,10 @@ export class FunnelResponseDto {
   @ApiProperty({ example: 12, description: 'Solicitações em status=received' })
   received!: number;
 
-  @ApiProperty({ example: 7, description: 'Solicitações em status=in_analysis' })
+  @ApiProperty({
+    example: 7,
+    description: 'Solicitações em status=in_analysis',
+  })
   inAnalysis!: number;
 
   @ApiProperty({ example: 4, description: 'Solicitações em status=approved' })

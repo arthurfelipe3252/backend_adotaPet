@@ -109,7 +109,8 @@ export class DashboardQueryDto {
     default: 30,
     minimum: 1,
     maximum: 365,
-    description: 'Threshold (dias sem solicitação) para a lista de pets parados',
+    description:
+      'Threshold (dias sem solicitação) para a lista de pets parados',
   })
   @IsOptional()
   @Type(() => Number)

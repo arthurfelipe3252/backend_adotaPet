@@ -16,7 +16,8 @@ export class DashboardResponseDto {
 
   @ApiProperty({
     type: [TimelinePointDto],
-    description: 'Série mensal de adoções (status=approved) nos últimos N meses',
+    description:
+      'Série mensal de adoções (status=approved) nos últimos N meses',
   })
   adoptionsTimeline!: TimelinePointDto[];
 

@@ -36,7 +36,8 @@ export class KpisResponseDto {
 
   @ApiProperty({
     example: 12,
-    description: 'Mensagens não lidas enviadas pelo adotante (sender ≠ protetor)',
+    description:
+      'Mensagens não lidas enviadas pelo adotante (sender ≠ protetor)',
   })
   mensagensNaoLidas!: number;
 

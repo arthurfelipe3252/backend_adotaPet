@@ -1,6 +1,8 @@
-import type { QuestionarioMatch } from "../models/questionario-match.entity";
+import type { QuestionarioMatch } from '../models/questionario-match.entity';
 
-export const QUESTIONARIO_MATCH_REPOSITORY = Symbol("QUESTIONARIO_MATCH_REPOSITORY");
+export const QUESTIONARIO_MATCH_REPOSITORY = Symbol(
+  'QUESTIONARIO_MATCH_REPOSITORY',
+);
 
 export interface QuestionarioMatchRepository {
   /** Salva ou substitui o questionário do adotante (1:1) */

@@ -31,7 +31,8 @@ export class TopPetDto {
 
   @ApiProperty({
     example: 8,
-    description: 'Total de solicitações recebidas para este pet (qualquer status)',
+    description:
+      'Total de solicitações recebidas para este pet (qualquer status)',
   })
   totalRequests!: number;
 }
