@@ -5,78 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1775765091002,
-      "tag": "0000_last_shotgun",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1775765091003,
-      "tag": "0001_initial_v2",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1775765091004,
-      "tag": "0002_imagem_base64_no_filho_e_documento",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1775765091005,
-      "tag": "0003_foto_url_pets",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1775765091006,
-      "tag": "0004_fotos_urls_pets",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1777586367718,
-      "tag": "0005_adoption_requests",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1779750959017,
-      "tag": "0006_match_questionario",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1777586367719,
-      "tag": "0004_foto_url_pets",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1777586367720,
-      "tag": "0005_fotos_urls_pets",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1779109378667,
-      "tag": "0006_curious_vivisector",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1779112000000,
-      "tag": "0007_chat",
+      "when": 1780251985523,
+      "tag": "0000_baseline",
       "breakpoints": true
     }
   ]

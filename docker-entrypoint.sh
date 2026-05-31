@@ -3,6 +3,14 @@ set -e
 
 # Aplica migrations Drizzle antes de subir o app. Retry porque DB externo
 # (Neon/Supabase) pode ter cold start na 1ª conexão do dia.
+#
+# Usa `npx drizzle-kit migrate` (CLI oficial). A source-of-truth é o
+# `_journal.json` em `src/shared/infra/database/drizzle/meta/` — gerado
+# por `npm run db:generate` a partir dos schemas TS.
+#
+# Política de PR (ver CLAUDE.md > Migrations): apenas 1 PR com migration
+# por vez. Conflitos no journal exigem regeração antes do merge. CI
+# valida integridade do journal via `drizzle-kit check`.
 attempts=0
 max_attempts=10
 
@@ -11,9 +19,8 @@ echo "==> Aplicando migrations Drizzle (drizzle-kit migrate)..."
 while [ "$attempts" -lt "$max_attempts" ]; do
   attempts=$((attempts + 1))
 
-  # Captura stdout+stderr para arquivo temporário e também imprime na tela.
-  # Sem isso, o spinner interativo do drizzle-kit (\r) sobrescreve a linha
-  # de erro e nunca vemos a causa real da falha.
+  # tee preserva a saída completa caso o spinner do drizzle-kit (\r)
+  # sobrescreva o erro real durante uma falha.
   if npx drizzle-kit migrate 2>&1 | tee /tmp/migrate.log; then
     echo "==> Migrations aplicadas. Iniciando NestJS..."
     exec node dist/main.js

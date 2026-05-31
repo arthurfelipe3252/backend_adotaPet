@@ -29,7 +29,8 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 
-# Migrations SQL escritas à mão + journal do drizzle-kit.
+# Migrations Drizzle (.sql + journal). O entrypoint roda
+# `npx drizzle-kit migrate` que consome esses arquivos.
 COPY --from=builder /app/src/shared/infra/database/drizzle ./src/shared/infra/database/drizzle
 
 # Entrypoint normaliza CRLF (caso script venha de checkout em Windows).
