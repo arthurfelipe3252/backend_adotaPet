@@ -53,7 +53,8 @@
       "PowerShell(Get-Process *)",
       "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' npx ts-node *)",
       "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' JWT_SECRET='R2FyYW50aXIgZSBwcm90ZWdlcg==' JWT_ACCESS_EXPIRES_IN='1d' JWT_REFRESH_EXPIRES_IN='7d' BCRYPT_SALT_ROUNDS='12' PORT='3000' npm run *)",
-      "PowerShell(Get-NetTCPConnection *)"
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell(npm run *)"
     ]
   }
 }

@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const tipoMoradiaEnum = pgEnum("tipo_moradia", [
   "casa_quintal_grande",
