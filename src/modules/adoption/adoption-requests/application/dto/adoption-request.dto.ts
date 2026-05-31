@@ -49,21 +49,14 @@ export class MatchQuestionnaireDto {
 }
 
 export class CreateAdoptionRequestDto {
+  // `adopterId` e `protetorId` NÃO estão no DTO:
+  //  - adopterId é resolvido a partir do JWT (só adotante pode criar
+  //    solicitação para si mesmo)
+  //  - protetorId é derivado de `pets.protetor_id` no service
+  // Aceitar do cliente permitiria spoofing de identidade.
   @ApiProperty({ example: 'b3a6f6b2-7d63-4b02-9f0e-9b37f9499c7d' })
   @IsString()
   petId!: string;
-
-  @ApiPropertyOptional({
-    example: '7c2d2c9f-2b45-47a1-bf56-0b8d1293a9c0',
-    description: 'ID do protetor/ONG responsavel pelo pet.',
-  })
-  @IsOptional()
-  @IsString()
-  protetorId?: string | null;
-
-  @ApiProperty({ example: '3a6a3d3f-5b86-4f42-9f9d-6c2a2a8e3c2f' })
-  @IsString()
-  adopterId!: string;
 
   @ApiPropertyOptional({
     example: 'Tenho experiencia com animais e posso receber visitas.',
@@ -106,4 +99,61 @@ export class UpdateAdoptionRequestStatusDto {
   @ApiProperty({ enum: ['received', 'in_analysis', 'approved', 'rejected'] })
   @IsEnum(['received', 'in_analysis', 'approved', 'rejected'])
   status!: AdoptionRequestStatus;
+}
+
+export class ProfileSummaryDto {
+  @ApiProperty({ example: 'b3a6f6b2-7d63-4b02-9f0e-9b37f9499c7d' })
+  id!: string;
+
+  @ApiProperty({ example: 'João da Silva' })
+  nome!: string;
+}
+
+export class AdoptionRequestResponseDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  petId!: string;
+
+  @ApiProperty()
+  adopterId!: string;
+
+  @ApiProperty({ nullable: true })
+  protetorId!: string | null;
+
+  /**
+   * Summary do adotante (id + nome) — populado pelo service via batch
+   * lookup. Nulo se o adotante foi excluído.
+   */
+  @ApiProperty({ type: ProfileSummaryDto, nullable: true })
+  adopter!: ProfileSummaryDto | null;
+
+  /**
+   * Summary do protetor/ong (id + nome). Nulo se a solicitação não tem
+   * protetor associado ou se ele foi excluído.
+   */
+  @ApiProperty({ type: ProfileSummaryDto, nullable: true })
+  protetor!: ProfileSummaryDto | null;
+
+  @ApiProperty({ enum: ['received', 'in_analysis', 'approved', 'rejected'] })
+  status!: AdoptionRequestStatus;
+
+  @ApiProperty({ enum: ['qualified', 'review', 'disqualified'] })
+  preTriageStatus!: AdoptionPreTriageStatus;
+
+  @ApiProperty({ nullable: true })
+  matchScore!: number | null;
+
+  @ApiProperty({ nullable: true })
+  matchAnswers!: Record<string, string | number | boolean | null> | null;
+
+  @ApiProperty({ nullable: true })
+  notes!: string | null;
+
+  @ApiProperty()
+  createdAt!: Date;
+
+  @ApiProperty()
+  updatedAt!: Date;
 }

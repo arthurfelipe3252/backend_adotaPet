@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -12,7 +12,7 @@ import { CriarAdotanteDto } from '@identity/adotantes/application/dto/criar-adot
 import { AdotanteService } from '@identity/adotantes/application/services/adotante.service';
 import type { AuthenticatedUser } from '@identity/usuarios/infra/auth/types/authenticated-user.type';
 import { CurrentUser } from '@identity/usuarios/infra/decorators/current-user.decorator';
-import { JwtAuthGuard } from '@identity/usuarios/infra/guards/jwt-auth.guard';
+import { Public } from '@identity/usuarios/infra/decorators/public.decorator';
 
 @ApiTags('Adotantes')
 @Controller('users/adotantes')
@@ -23,6 +23,7 @@ export class AdotantesController {
   // POST /users/adotantes — registro atômico (público)
   // ----------------------------------------------------------------
   @Post()
+  @Public()
   @ApiOperation({
     summary: 'Cadastra um novo adotante',
     description:
@@ -47,12 +48,8 @@ export class AdotantesController {
 
   // ----------------------------------------------------------------
   // GET /users/adotantes/me — perfil completo do adotante autenticado
-  //
-  // Não há GET /:id porque o id sempre vem do JWT — não dá pra pedir
-  // o perfil de outro adotante por aqui (privacidade por construção).
   // ----------------------------------------------------------------
   @Get('me')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Retorna o perfil completo do adotante autenticado',
@@ -82,16 +79,8 @@ export class AdotantesController {
 
   // ----------------------------------------------------------------
   // PATCH /users/adotantes/me — atualiza perfil completo do adotante
-  //
-  // Atualiza, em uma única transação, qualquer combinação de:
-  //  - dados do usuário-mãe (nome, email, telefone)
-  //  - dados do adotante  (imagemBase64)
-  //  - endereço            (cria, atualiza in-place ou desvincula com null)
-  //
-  // Imutáveis aqui: cpf, tipoUsuario, senha (use PATCH /users/me/password).
   // ----------------------------------------------------------------
   @Patch('me')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Atualiza o perfil do adotante autenticado',

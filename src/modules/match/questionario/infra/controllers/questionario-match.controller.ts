@@ -6,28 +6,27 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@identity/usuarios/infra/guards/jwt-auth.guard';
 import { CurrentUser } from '@identity/usuarios/infra/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '@identity/usuarios/infra/auth/types/authenticated-user.type';
 import { QuestionarioMatchService } from '@match/questionario/application/services/questionario-match.service';
 import { SalvarQuestionarioDto } from '@match/questionario/application/dto/questionario-match.dto';
 
+/**
+ * Endpoints de questionário de match. Todos exigem JWT (guard global) e
+ * autorizam apenas usuários do tipo `adotante` — protetores/ONGs recebem
+ * 403. Endpoints com `:adotanteId` na URL verificam ownership.
+ */
 @ApiTags('Match')
 @ApiBearerAuth('access-token')
-@UseGuards(JwtAuthGuard)
 @Controller('match')
 export class QuestionarioMatchController {
   constructor(private readonly service: QuestionarioMatchService) {}
 
-  /**
-   * POST /api/v1/match/questionario
-   * Salva (cria ou atualiza) o questionário do usuário autenticado.
-   * O id do usuário é usado como adotanteId.
-   */
+  // POST /api/v1/match/questionario — cria/atualiza meu questionário
   @Post('questionario')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Salvar / atualizar questionário de match' })
@@ -35,58 +34,56 @@ export class QuestionarioMatchController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: SalvarQuestionarioDto,
   ) {
-    return this.service.salvar(user.id, dto);
+    return this.service.salvar(user.id, user.tipoUsuario, dto);
   }
 
-  /**
-   * GET /api/v1/match/questionario
-   * Retorna o questionário salvo do usuário autenticado.
-   */
+  // GET /api/v1/match/questionario — meu questionário
   @Get('questionario')
   @ApiOperation({ summary: 'Buscar meu questionário de match' })
   buscarMeu(@CurrentUser() user: AuthenticatedUser) {
-    return this.service.buscarPorAdotante(user.id);
+    return this.service.buscarMeu(user.id, user.tipoUsuario);
   }
 
-  /**
-   * GET /api/v1/match/questionario/:adotanteId
-   * Consulta o questionário de qualquer adotante (admin / protetor).
-   */
+  // GET /api/v1/match/questionario/:adotanteId — ownership
   @Get('questionario/:adotanteId')
   @ApiOperation({ summary: 'Buscar questionário de match por adotanteId' })
-  buscarPorAdotante(@Param('adotanteId') adotanteId: string) {
-    return this.service.buscarPorAdotante(adotanteId);
+  buscarPorAdotante(
+    @Param('adotanteId', ParseUUIDPipe) adotanteId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.service.buscarPorAdotante(
+      adotanteId,
+      user.id,
+      user.tipoUsuario,
+    );
   }
 
-  /**
-   * GET /api/v1/match/resultado
-   * Calcula e retorna os pets compatíveis para o usuário autenticado,
-   * ordenados por score de compatibilidade decrescente.
-   */
+  // GET /api/v1/match/resultado — meu resultado
   @Get('resultado')
   @ApiOperation({ summary: 'Calcular meu resultado de match' })
   calcularMeuMatch(@CurrentUser() user: AuthenticatedUser) {
-    return this.service.calcularMatch(user.id);
+    return this.service.calcularMeuMatch(user.id, user.tipoUsuario);
   }
 
-  /**
-   * GET /api/v1/match/resultado/:adotanteId
-   * Calcula o resultado de match para um adotante específico.
-   */
+  // GET /api/v1/match/resultado/:adotanteId — ownership
   @Get('resultado/:adotanteId')
   @ApiOperation({ summary: 'Calcular resultado de match por adotanteId' })
-  calcularMatch(@Param('adotanteId') adotanteId: string) {
-    return this.service.calcularMatch(adotanteId);
+  calcularMatch(
+    @Param('adotanteId', ParseUUIDPipe) adotanteId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.service.calcularMatch(
+      adotanteId,
+      user.id,
+      user.tipoUsuario,
+    );
   }
 
-  /**
-   * DELETE /api/v1/match/questionario
-   * Remove o questionário do usuário autenticado (para refazer o quiz).
-   */
+  // DELETE /api/v1/match/questionario — meu questionário
   @Delete('questionario')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remover questionário (para refazer o quiz)' })
   remover(@CurrentUser() user: AuthenticatedUser) {
-    return this.service.remover(user.id);
+    return this.service.remover(user.id, user.tipoUsuario);
   }
 }

@@ -5,7 +5,6 @@ import {
   HttpStatus,
   Post,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,7 +21,7 @@ import { AuthService } from '@identity/usuarios/application/services/auth.servic
 import { LoginMeta } from '@identity/usuarios/application/types/login-meta.type';
 import type { AuthenticatedUser } from '@identity/usuarios/infra/auth/types/authenticated-user.type';
 import { CurrentUser } from '@identity/usuarios/infra/decorators/current-user.decorator';
-import { JwtAuthGuard } from '@identity/usuarios/infra/guards/jwt-auth.guard';
+import { Public } from '@identity/usuarios/infra/decorators/public.decorator';
 
 @ApiTags('Auth')
 @Controller('users/auth')
@@ -33,6 +32,7 @@ export class AuthController {
   // POST /auth/login
   // ----------------------------------------------------------------
   @Post('login')
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Autentica com email e senha',
@@ -59,6 +59,7 @@ export class AuthController {
   // POST /auth/refresh
   // ----------------------------------------------------------------
   @Post('refresh')
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Rotaciona o par de tokens',
@@ -86,7 +87,6 @@ export class AuthController {
   // ----------------------------------------------------------------
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Revoga o refresh token informado',
@@ -109,7 +109,6 @@ export class AuthController {
   // ----------------------------------------------------------------
   @Post('logout-all')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Revoga todos os refresh tokens do usuário',

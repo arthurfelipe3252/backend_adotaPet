@@ -60,7 +60,8 @@
       "Bash(mv -v 0006_curious_vivisector.sql 0006_add_protetor_id_to_adoption_requests.sql)",
       "Bash(rm -rfv meta/)",
       "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' npx drizzle-kit generate --name=baseline)",
-      "Bash(npx ts-node *)"
+      "Bash(npx ts-node *)",
+      "Bash(npm test *)"
     ]
   }
 }

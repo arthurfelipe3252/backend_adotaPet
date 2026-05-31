@@ -5,8 +5,12 @@ import type {
   PetStatus,
 } from '../../domain/models/pet.entity';
 
+/**
+ * Body do POST /pets. O `protetorId` NÃO está aqui de propósito: é
+ * resolvido a partir do JWT no service. Aceitar do cliente permitiria
+ * que um protetor criasse pet em nome de outro.
+ */
 export interface CreatePetDto {
-  protetorId: string;
   nome: string;
   especie: Especie;
   raca?: string | null;
@@ -20,16 +24,24 @@ export interface CreatePetDto {
   fotosUrls?: string[] | null;
 }
 
-export interface UpdatePetDto extends Partial<
-  Omit<CreatePetDto, 'protetorId'>
-> {
+export interface UpdatePetDto extends Partial<CreatePetDto> {
   status?: PetStatus;
   fotosUrls?: string[] | null;
+}
+
+export interface ProfileSummary {
+  id: string;
+  nome: string;
 }
 
 export interface PetResponseDto {
   id: string;
   protetorId: string;
+  /**
+   * Summary (id + nome) do protetor/ong dono — populado pelo service
+   * via batch lookup. Nulo se o protetor foi excluído.
+   */
+  protetor: ProfileSummary | null;
   nome: string;
   especie: Especie;
   raca: string | null;

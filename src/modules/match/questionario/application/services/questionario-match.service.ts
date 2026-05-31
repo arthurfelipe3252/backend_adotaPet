@@ -1,9 +1,20 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PET_REPOSITORY } from '@catalog/pets/domain/repositories/pet-repository.interface';
 import type { PetRepository } from '@catalog/pets/domain/repositories/pet-repository.interface';
 import { QUESTIONARIO_MATCH_REPOSITORY } from '@match/questionario/domain/repositories/questionario-match-repository.interface';
 import type { QuestionarioMatchRepository } from '@match/questionario/domain/repositories/questionario-match-repository.interface';
 import { QuestionarioMatch } from '@match/questionario/domain/models/questionario-match.entity';
+import {
+  ADOTANTE_REPOSITORY,
+  type AdotanteRepository,
+} from '@identity/adotantes/domain/repositories/adotante-repository.interface';
+import { TipoUsuario } from '@identity/usuarios/domain/enums/tipo-usuario.enum';
+import { resolveAdotanteIdOrFail } from '@identity/usuarios/application/helpers/resolve-profile-id.helper';
 import { MatchScoringService } from './match-scoring.service';
 import type {
   SalvarQuestionarioDto,
@@ -12,6 +23,17 @@ import type {
   QuestionarioMatchResponseDto,
 } from '@match/questionario/application/dto/questionario-match.dto';
 
+/**
+ * Regras de autorização do contexto @match/questionario:
+ *
+ *  - Todos os endpoints exigem JWT (guard global).
+ *  - Apenas usuários do tipo `adotante` podem ler/escrever — protetores/
+ *    ONGs não têm questionário próprio. O ID resolvido é
+ *    `adotantes.id`, NÃO `usuarios.id`.
+ *  - Os endpoints com `:adotanteId` na URL aplicam ownership: 403 se
+ *    o ID não corresponder ao adotante autenticado. Servem só pra
+ *    quando o frontend já tem o adotanteId em mãos.
+ */
 @Injectable()
 export class QuestionarioMatchService {
   constructor(
@@ -19,6 +41,8 @@ export class QuestionarioMatchService {
     private readonly questionarioRepo: QuestionarioMatchRepository,
     @Inject(PET_REPOSITORY)
     private readonly petRepo: PetRepository,
+    @Inject(ADOTANTE_REPOSITORY)
+    private readonly adotanteRepo: AdotanteRepository,
     private readonly scoring: MatchScoringService,
   ) {}
 
@@ -38,9 +62,16 @@ export class QuestionarioMatchService {
   }
 
   async salvar(
-    adotanteId: string,
+    usuarioId: string,
+    tipoUsuario: TipoUsuario,
     dto: SalvarQuestionarioDto,
   ): Promise<QuestionarioMatchResponseDto> {
+    const adotanteId = await resolveAdotanteIdOrFail(
+      this.adotanteRepo,
+      usuarioId,
+      tipoUsuario,
+    );
+
     const questionario = QuestionarioMatch.create({
       adotanteId,
       tipoMoradia: dto.tipoMoradia,
@@ -54,18 +85,98 @@ export class QuestionarioMatchService {
     return this.toResponse(salvo);
   }
 
+  async buscarMeu(
+    usuarioId: string,
+    tipoUsuario: TipoUsuario,
+  ): Promise<QuestionarioMatchResponseDto> {
+    const adotanteId = await resolveAdotanteIdOrFail(
+      this.adotanteRepo,
+      usuarioId,
+      tipoUsuario,
+    );
+    return this.buscarInterno(adotanteId);
+  }
+
   async buscarPorAdotante(
+    adotanteIdParam: string,
+    usuarioId: string,
+    tipoUsuario: TipoUsuario,
+  ): Promise<QuestionarioMatchResponseDto> {
+    await this.assertOwner(adotanteIdParam, usuarioId, tipoUsuario);
+    return this.buscarInterno(adotanteIdParam);
+  }
+
+  async calcularMeuMatch(
+    usuarioId: string,
+    tipoUsuario: TipoUsuario,
+  ): Promise<MatchResultResponseDto> {
+    const adotanteId = await resolveAdotanteIdOrFail(
+      this.adotanteRepo,
+      usuarioId,
+      tipoUsuario,
+    );
+    return this.calcularInterno(adotanteId);
+  }
+
+  async calcularMatch(
+    adotanteIdParam: string,
+    usuarioId: string,
+    tipoUsuario: TipoUsuario,
+  ): Promise<MatchResultResponseDto> {
+    await this.assertOwner(adotanteIdParam, usuarioId, tipoUsuario);
+    return this.calcularInterno(adotanteIdParam);
+  }
+
+  async remover(
+    usuarioId: string,
+    tipoUsuario: TipoUsuario,
+  ): Promise<void> {
+    const adotanteId = await resolveAdotanteIdOrFail(
+      this.adotanteRepo,
+      usuarioId,
+      tipoUsuario,
+    );
+    const q = await this.questionarioRepo.findByAdotanteId(adotanteId);
+    if (!q) {
+      throw new NotFoundException(
+        `Adotante ${adotanteId} não possui questionário de match.`,
+      );
+    }
+    await this.questionarioRepo.deleteByAdotanteId(adotanteId);
+  }
+
+  private async assertOwner(
+    adotanteIdParam: string,
+    usuarioId: string,
+    tipoUsuario: TipoUsuario,
+  ): Promise<void> {
+    const adotanteId = await resolveAdotanteIdOrFail(
+      this.adotanteRepo,
+      usuarioId,
+      tipoUsuario,
+    );
+    if (adotanteId !== adotanteIdParam) {
+      throw new ForbiddenException(
+        'Você só pode acessar seu próprio questionário de match',
+      );
+    }
+  }
+
+  private async buscarInterno(
     adotanteId: string,
   ): Promise<QuestionarioMatchResponseDto> {
     const q = await this.questionarioRepo.findByAdotanteId(adotanteId);
-    if (!q)
+    if (!q) {
       throw new NotFoundException(
         `Adotante ${adotanteId} ainda não respondeu ao questionário de match.`,
       );
+    }
     return this.toResponse(q);
   }
 
-  async calcularMatch(adotanteId: string): Promise<MatchResultResponseDto> {
+  private async calcularInterno(
+    adotanteId: string,
+  ): Promise<MatchResultResponseDto> {
     const questionario =
       await this.questionarioRepo.findByAdotanteId(adotanteId);
     if (!questionario) {
@@ -99,14 +210,5 @@ export class QuestionarioMatchService {
       totalPetsAnalisados: pets.length,
       geradoEm: new Date(),
     };
-  }
-
-  async remover(adotanteId: string): Promise<void> {
-    const q = await this.questionarioRepo.findByAdotanteId(adotanteId);
-    if (!q)
-      throw new NotFoundException(
-        `Adotante ${adotanteId} não possui questionário de match.`,
-      );
-    await this.questionarioRepo.deleteByAdotanteId(adotanteId);
   }
 }

@@ -4,10 +4,15 @@ export const ADOPTION_REQUEST_REPOSITORY = Symbol(
   'ADOPTION_REQUEST_REPOSITORY',
 );
 
+export interface AdoptionRequestFilters {
+  adopterId?: string;
+  protetorId?: string;
+}
+
 export interface AdoptionRequestRepository {
   create(request: AdoptionRequest): Promise<void>;
   update(request: AdoptionRequest): Promise<void>;
   delete(id: string): Promise<void>;
-  findAll(): Promise<AdoptionRequest[]>;
+  findAll(filters?: AdoptionRequestFilters): Promise<AdoptionRequest[]>;
   findById(id: string): Promise<AdoptionRequest | null>;
 }
