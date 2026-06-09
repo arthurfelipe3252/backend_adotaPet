@@ -40,8 +40,6 @@ Thumbs.db
 # NestJS
 .nest/
 
-# Drizzle
-drizzle/meta/
 
 # Monolito original (referência, não faz parte da migração)
 backend_adotaPet/
