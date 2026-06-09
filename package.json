@@ -1,0 +1,14 @@
+{
+  "name": "adotapet-monorepo",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build:all": "npm run build --prefix services/user-auth && npm run build --prefix services/catalog && npm run build --prefix services/adoption && npm run build --prefix services/chat",
+    "typecheck:all": "npm run typecheck --prefix services/user-auth && npm run typecheck --prefix services/catalog && npm run typecheck --prefix services/adoption && npm run typecheck --prefix services/chat",
+    "lint": "biome lint .",
+    "check": "biome check ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  }
+}

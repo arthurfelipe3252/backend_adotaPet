@@ -1,0 +1,54 @@
+# Dependencies
+node_modules
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# NestJS
+.nest/
+
+# Drizzle
+drizzle/meta/
+
+# Monolito original (referência, não faz parte da migração)
+backend_adotaPet/
+
+# Knowledge graph (generated)
+graphify-out/
+
+# Package lock files (escolha um e delete o resto)
+# yarn.lock
+# pnpm-lock.yaml

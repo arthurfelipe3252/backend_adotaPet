@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../../shared/src/*"],
+      "@chat/*": ["./src/modules/chat/*"]
+    }
+  },
+  "include": ["src", "../../shared/src"]
+}

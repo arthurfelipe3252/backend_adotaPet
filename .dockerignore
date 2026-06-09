@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+**/.env
+**/coverage
+graphify-out
+.git
+.DS_Store
+backend_adotaPet
