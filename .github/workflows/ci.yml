@@ -17,6 +17,7 @@ jobs:
     timeout-minutes: 20
 
     strategy:
+      fail-fast: false
       matrix:
         service: [user-auth, catalog, adoption, chat]
 
