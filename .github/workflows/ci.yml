@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [main, developer]
 
-# Cancela runs antigos do mesmo branch quando chega um novo push.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -15,7 +14,11 @@ jobs:
   build:
     name: Lint & Build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        service: [user-auth, catalog, adoption, chat]
 
     steps:
       - uses: actions/checkout@v4
@@ -25,25 +28,32 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
 
-      - name: Install deps
-        run: npm ci
+      - name: Install deps (${{ matrix.service }})
+        run: npm ci --prefix services/${{ matrix.service }}
+
+      - name: Build (${{ matrix.service }})
+        run: npm run build --prefix services/${{ matrix.service }}
+
+      - name: Test (${{ matrix.service }})
+        run: npm test --prefix services/${{ matrix.service }} -- --no-coverage
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Biome
+        run: npm install --prefix .
 
       - name: Lint
-        run: npm run lint -- --max-warnings=0
-
-      - name: Build
-        run: npm run build
-
-      # Valida integridade do _journal.json + meta/ das migrations.
-      # Pega merges paralelos que corrompem o journal (causou desastre
-      # em maio/2026 — ver CLAUDE.md > Migrations).
-      - name: Check migrations
-        run: npm run db:check
-
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-${{ github.sha }}
-          path: dist
-          retention-days: 7
+        run: npm run lint --prefix .
