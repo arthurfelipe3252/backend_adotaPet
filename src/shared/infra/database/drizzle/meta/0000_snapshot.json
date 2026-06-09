@@ -1,0 +1,1030 @@
+{
+  "id": "3e310217-a12d-41b2-8216-8022f256a4c5",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.adoption_requests": {
+      "name": "adoption_requests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "pet_id": {
+          "name": "pet_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "protetor_id": {
+          "name": "protetor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "adopter_id": {
+          "name": "adopter_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pre_triage_status": {
+          "name": "pre_triage_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "match_score": {
+          "name": "match_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "match_answers": {
+          "name": "match_answers",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pets": {
+      "name": "pets",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "protetor_id": {
+          "name": "protetor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nome": {
+          "name": "nome",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "especie": {
+          "name": "especie",
+          "type": "especie",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "raca": {
+          "name": "raca",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "porte": {
+          "name": "porte",
+          "type": "porte",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sexo": {
+          "name": "sexo",
+          "type": "sexo",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "idade_meses": {
+          "name": "idade_meses",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "castrado": {
+          "name": "castrado",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "vacinado": {
+          "name": "vacinado",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "temperamento": {
+          "name": "temperamento",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "pet_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'disponivel'"
+        },
+        "fotos_urls": {
+          "name": "fotos_urls",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.conversations": {
+      "name": "conversations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "adoption_request_id": {
+          "name": "adoption_request_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "adopter_id": {
+          "name": "adopter_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "protetor_id": {
+          "name": "protetor_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "conversations_adoption_request_id_unique": {
+          "name": "conversations_adoption_request_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "adoption_request_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.messages": {
+      "name": "messages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sender_id": {
+          "name": "sender_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_read": {
+          "name": "is_read",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_messages_conversation_created_at": {
+          "name": "idx_messages_conversation_created_at",
+          "columns": [
+            {
+              "expression": "conversation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.adotantes": {
+      "name": "adotantes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cpf": {
+          "name": "cpf",
+          "type": "char(11)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "endereco_id": {
+          "name": "endereco_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imagem_base64": {
+          "name": "imagem_base64",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "adotantes_usuario_id_usuarios_id_fk": {
+          "name": "adotantes_usuario_id_usuarios_id_fk",
+          "tableFrom": "adotantes",
+          "tableTo": "usuarios",
+          "columnsFrom": [
+            "usuario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "adotantes_endereco_id_enderecos_id_fk": {
+          "name": "adotantes_endereco_id_enderecos_id_fk",
+          "tableFrom": "adotantes",
+          "tableTo": "enderecos",
+          "columnsFrom": [
+            "endereco_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "adotantes_usuario_id_unique": {
+          "name": "adotantes_usuario_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "usuario_id"
+          ]
+        },
+        "adotantes_cpf_unique": {
+          "name": "adotantes_cpf_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cpf"
+          ]
+        },
+        "adotantes_endereco_id_unique": {
+          "name": "adotantes_endereco_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "endereco_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.enderecos": {
+      "name": "enderecos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "logradouro": {
+          "name": "logradouro",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero": {
+          "name": "numero",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "complemento": {
+          "name": "complemento",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bairro": {
+          "name": "bairro",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cidade": {
+          "name": "cidade",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "char(2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cep": {
+          "name": "cep",
+          "type": "char(8)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.protetores_ongs": {
+      "name": "protetores_ongs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cpf_cnpj": {
+          "name": "cpf_cnpj",
+          "type": "varchar(14)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefone_contato": {
+          "name": "telefone_contato",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imagem_base64": {
+          "name": "imagem_base64",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "documento_comprobatorio": {
+          "name": "documento_comprobatorio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "endereco_id": {
+          "name": "endereco_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "protetores_ongs_usuario_id_usuarios_id_fk": {
+          "name": "protetores_ongs_usuario_id_usuarios_id_fk",
+          "tableFrom": "protetores_ongs",
+          "tableTo": "usuarios",
+          "columnsFrom": [
+            "usuario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "protetores_ongs_endereco_id_enderecos_id_fk": {
+          "name": "protetores_ongs_endereco_id_enderecos_id_fk",
+          "tableFrom": "protetores_ongs",
+          "tableTo": "enderecos",
+          "columnsFrom": [
+            "endereco_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "protetores_ongs_usuario_id_unique": {
+          "name": "protetores_ongs_usuario_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "usuario_id"
+          ]
+        },
+        "protetores_ongs_cpf_cnpj_unique": {
+          "name": "protetores_ongs_cpf_cnpj_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cpf_cnpj"
+          ]
+        },
+        "protetores_ongs_endereco_id_unique": {
+          "name": "protetores_ongs_endereco_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "endereco_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.refresh_tokens": {
+      "name": "refresh_tokens",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "varchar(45)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "refresh_tokens_usuario_id_usuarios_id_fk": {
+          "name": "refresh_tokens_usuario_id_usuarios_id_fk",
+          "tableFrom": "refresh_tokens",
+          "tableTo": "usuarios",
+          "columnsFrom": [
+            "usuario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "refresh_tokens_token_hash_unique": {
+          "name": "refresh_tokens_token_hash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token_hash"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.usuarios": {
+      "name": "usuarios",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "nome": {
+          "name": "nome",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "senha_hash": {
+          "name": "senha_hash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "telefone": {
+          "name": "telefone",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo_usuario": {
+          "name": "tipo_usuario",
+          "type": "tipo_usuario",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ativo": {
+          "name": "ativo",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "usuarios_email_unique": {
+          "name": "usuarios_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.questionario_match": {
+      "name": "questionario_match",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "adotante_id": {
+          "name": "adotante_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo_moradia": {
+          "name": "tipo_moradia",
+          "type": "tipo_moradia",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disponibilidade": {
+          "name": "disponibilidade",
+          "type": "disponibilidade_match",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "experiencia_previa": {
+          "name": "experiencia_previa",
+          "type": "experiencia_previa",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criancas_em_casa": {
+          "name": "criancas_em_casa",
+          "type": "criancas_em_casa",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "outros_pets": {
+          "name": "outros_pets",
+          "type": "outros_pets_match",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "perfil_companheiro": {
+          "name": "perfil_companheiro",
+          "type": "perfil_companheiro",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "questionario_match_adotante_id_unique": {
+          "name": "questionario_match_adotante_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "adotante_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.especie": {
+      "name": "especie",
+      "schema": "public",
+      "values": [
+        "cao",
+        "gato",
+        "outro"
+      ]
+    },
+    "public.pet_status": {
+      "name": "pet_status",
+      "schema": "public",
+      "values": [
+        "disponivel",
+        "em_processo",
+        "adotado"
+      ]
+    },
+    "public.porte": {
+      "name": "porte",
+      "schema": "public",
+      "values": [
+        "pequeno",
+        "medio",
+        "grande"
+      ]
+    },
+    "public.sexo": {
+      "name": "sexo",
+      "schema": "public",
+      "values": [
+        "macho",
+        "femea"
+      ]
+    },
+    "public.tipo_usuario": {
+      "name": "tipo_usuario",
+      "schema": "public",
+      "values": [
+        "adotante",
+        "protetor",
+        "ong"
+      ]
+    },
+    "public.criancas_em_casa": {
+      "name": "criancas_em_casa",
+      "schema": "public",
+      "values": [
+        "bebe",
+        "crianca_pequena",
+        "crianca_maior",
+        "nao"
+      ]
+    },
+    "public.disponibilidade_match": {
+      "name": "disponibilidade_match",
+      "schema": "public",
+      "values": [
+        "fica_em_casa",
+        "sai_almoco",
+        "passa_dia_fora",
+        "viaja_frequentemente"
+      ]
+    },
+    "public.experiencia_previa": {
+      "name": "experiencia_previa",
+      "schema": "public",
+      "values": [
+        "sim_tem_experiencia",
+        "sim_faz_tempo",
+        "nunca_quer_aprender",
+        "primeiro_pet_familia"
+      ]
+    },
+    "public.outros_pets_match": {
+      "name": "outros_pets_match",
+      "schema": "public",
+      "values": [
+        "cao",
+        "gato",
+        "outros",
+        "nao"
+      ]
+    },
+    "public.perfil_companheiro": {
+      "name": "perfil_companheiro",
+      "schema": "public",
+      "values": [
+        "tranquilo",
+        "energetico",
+        "carinhoso",
+        "inteligente"
+      ]
+    },
+    "public.tipo_moradia": {
+      "name": "tipo_moradia",
+      "schema": "public",
+      "values": [
+        "casa_quintal_grande",
+        "casa_quintal_pequeno",
+        "apartamento",
+        "apartamento_lazer"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
