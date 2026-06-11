@@ -12,6 +12,7 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  IsUUID,
   Max,
   MaxLength,
   Min,
@@ -55,7 +56,7 @@ export class CreateAdoptionRequestDto {
   //  - protetorId é derivado de `pets.protetor_id` no service
   // Aceitar do cliente permitiria spoofing de identidade.
   @ApiProperty({ example: 'b3a6f6b2-7d63-4b02-9f0e-9b37f9499c7d' })
-  @IsString()
+  @IsUUID()
   petId!: string;
 
   @ApiPropertyOptional({

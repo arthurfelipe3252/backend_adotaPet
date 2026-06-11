@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -134,7 +135,21 @@ export class MessageService {
     );
     if (!conversation) throw new NotFoundException('Conversa não encontrada');
 
-    await this.resolveParticipantIdOrFail(conversation, usuarioId, tipoUsuario);
+    const viewerProfileId = await this.resolveParticipantIdOrFail(
+      conversation,
+      usuarioId,
+      tipoUsuario,
+    );
+
+    // Não permite marcar a própria mensagem como lida — só faz sentido
+    // marcar as recebidas. O cálculo de `unreadCount` filtra
+    // `sender_id != viewer`, então marcar a própria seria efeito nulo
+    // pra UI e ainda sujaria o estado.
+    if (message.senderId === viewerProfileId) {
+      throw new BadRequestException(
+        'Não é possível marcar a própria mensagem como lida',
+      );
+    }
 
     message.withRead(dto.isRead).touch(new Date());
     await this.messageRepository.update(message);

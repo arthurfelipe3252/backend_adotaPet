@@ -27,6 +27,11 @@ export const messagesSchema = pgTable(
       table.conversationId,
       table.createdAt,
     ),
+    // Acelera contagem de não-lidas por conversa (filtro por isRead=false)
+    conversationIsReadIdx: index('idx_messages_conversation_is_read').on(
+      table.conversationId,
+      table.isRead,
+    ),
   }),
 );
 
