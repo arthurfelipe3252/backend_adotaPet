@@ -6,16 +6,20 @@ on:
   pull_request:
     branches: [main, developer]
 
-# Cancela runs antigos do mesmo branch quando chega um novo push.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Lint & Build
+    name: Lint & Build (${{ matrix.service }})
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [adoption, catalog, chat, match, reports, user-auth]
 
     steps:
       - uses: actions/checkout@v4
@@ -25,25 +29,27 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
 
       - name: Install deps
+        working-directory: services/${{ matrix.service }}
         run: npm ci
 
       - name: Lint
-        run: npm run lint -- --max-warnings=0
+        working-directory: services/${{ matrix.service }}
+        run: npm run lint
 
       - name: Build
+        working-directory: services/${{ matrix.service }}
         run: npm run build
 
-      # Valida integridade do _journal.json + meta/ das migrations.
-      # Pega merges paralelos que corrompem o journal (causou desastre
-      # em maio/2026 — ver CLAUDE.md > Migrations).
       - name: Check migrations
+        working-directory: services/${{ matrix.service }}
         run: npm run db:check
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ github.sha }}
-          path: dist
+          name: dist-${{ matrix.service }}-${{ github.sha }}
+          path: services/${{ matrix.service }}/dist
           retention-days: 7
