@@ -1,0 +1,57 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "../..",
+    "baseUrl": "./",
+    "paths": {
+      "@shared/*": [
+        "../../shared/src/*"
+      ],
+      "@match/*": [
+        "./src/modules/match/*"
+      ],
+      "@nestjs/*": [
+        "node_modules/@nestjs/*"
+      ],
+      "express": [
+        "node_modules/express"
+      ],
+      "rxjs": [
+        "node_modules/rxjs"
+      ],
+      "rxjs/*": [
+        "node_modules/rxjs/*"
+      ],
+      "drizzle-orm": [
+        "node_modules/drizzle-orm"
+      ],
+      "drizzle-orm/*": [
+        "node_modules/drizzle-orm/*"
+      ],
+      "pg": [
+        "node_modules/pg"
+      ],
+      "amqplib": [
+        "node_modules/amqplib"
+      ],
+      "class-validator": [
+        "node_modules/class-validator"
+      ],
+      "cpf-cnpj-validator": [
+        "node_modules/cpf-cnpj-validator"
+      ]
+    },
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
+  "include": [
+    "src",
+    "../../shared/src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

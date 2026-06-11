@@ -1,6 +1,6 @@
-# Nestjs specific
-/dist
-/node_modules
+# Build artifacts and dependencies
+dist/
+node_modules/
 /build
 /tmp
 
@@ -36,3 +36,4 @@ Desktop.ini
 
 # Coverage
 /coverage
+node_modules
