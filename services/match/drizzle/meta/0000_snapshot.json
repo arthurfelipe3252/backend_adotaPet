@@ -1,0 +1,168 @@
+{
+  "id": "cac49a81-4be4-440d-bfdc-e8fdd2d40f43",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.questionario_match": {
+      "name": "questionario_match",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "adotante_id": {
+          "name": "adotante_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo_moradia": {
+          "name": "tipo_moradia",
+          "type": "tipo_moradia",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disponibilidade": {
+          "name": "disponibilidade",
+          "type": "disponibilidade_match",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "experiencia_previa": {
+          "name": "experiencia_previa",
+          "type": "experiencia_previa",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criancas_em_casa": {
+          "name": "criancas_em_casa",
+          "type": "criancas_em_casa",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "outros_pets": {
+          "name": "outros_pets",
+          "type": "outros_pets_match",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "perfil_companheiro": {
+          "name": "perfil_companheiro",
+          "type": "perfil_companheiro",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "questionario_match_adotante_id_unique": {
+          "name": "questionario_match_adotante_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "adotante_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.criancas_em_casa": {
+      "name": "criancas_em_casa",
+      "schema": "public",
+      "values": [
+        "bebe",
+        "crianca_pequena",
+        "crianca_maior",
+        "nao"
+      ]
+    },
+    "public.disponibilidade_match": {
+      "name": "disponibilidade_match",
+      "schema": "public",
+      "values": [
+        "fica_em_casa",
+        "sai_almoco",
+        "passa_dia_fora",
+        "viaja_frequentemente"
+      ]
+    },
+    "public.experiencia_previa": {
+      "name": "experiencia_previa",
+      "schema": "public",
+      "values": [
+        "sim_tem_experiencia",
+        "sim_faz_tempo",
+        "nunca_quer_aprender",
+        "primeiro_pet_familia"
+      ]
+    },
+    "public.outros_pets_match": {
+      "name": "outros_pets_match",
+      "schema": "public",
+      "values": [
+        "cao",
+        "gato",
+        "outros",
+        "nao"
+      ]
+    },
+    "public.perfil_companheiro": {
+      "name": "perfil_companheiro",
+      "schema": "public",
+      "values": [
+        "tranquilo",
+        "energetico",
+        "carinhoso",
+        "inteligente"
+      ]
+    },
+    "public.tipo_moradia": {
+      "name": "tipo_moradia",
+      "schema": "public",
+      "values": [
+        "casa_quintal_grande",
+        "casa_quintal_pequeno",
+        "apartamento",
+        "apartamento_lazer"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
