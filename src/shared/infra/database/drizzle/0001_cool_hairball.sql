@@ -1,0 +1,1 @@
+CREATE INDEX "idx_messages_conversation_is_read" ON "messages" USING btree ("conversation_id","is_read");

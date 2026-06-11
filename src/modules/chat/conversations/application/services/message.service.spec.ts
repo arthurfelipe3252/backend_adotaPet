@@ -1,4 +1,8 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { MessageService } from '@chat/conversations/application/services/message.service';
 import { Message } from '@chat/conversations/domain/models/message.entity';
 import { Conversation } from '@chat/conversations/domain/models/conversation.entity';
@@ -173,12 +177,13 @@ describe('MessageService', () => {
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('updates message read status', async () => {
+  it('updates message read status (msg do outro participante)', async () => {
+    // Adotante marcando como lida uma mensagem enviada pelo protetor.
     const message = Message.restore({
       id: '66666666-6666-6666-6666-666666666666',
       conversationId,
-      senderId: adopterId,
-      content: 'Ping',
+      senderId: protetorId,
+      content: 'Ping do protetor',
       isRead: false,
       createdAt: new Date('2026-05-18T11:00:00.000Z'),
       updatedAt: new Date('2026-05-18T11:00:00.000Z'),
@@ -212,5 +217,30 @@ describe('MessageService', () => {
         { isRead: true },
       ),
     ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('refuses to mark own message as read (400)', async () => {
+    // Adotante tentando marcar uma mensagem que ele próprio enviou.
+    const ownMessage = Message.restore({
+      id: '88888888-8888-8888-8888-888888888888',
+      conversationId,
+      senderId: adopterId,
+      content: 'mensagem própria',
+      isRead: false,
+      createdAt: new Date('2026-05-18T11:00:00.000Z'),
+      updatedAt: new Date('2026-05-18T11:00:00.000Z'),
+    })!;
+    messageRepository.findById.mockResolvedValue(ownMessage);
+    conversationRepository.findById.mockResolvedValue(buildConversation());
+
+    await expect(
+      service.updateReadStatus(
+        ownMessage.id!,
+        adopterUsuarioId,
+        TipoUsuario.Adotante,
+        { isRead: true },
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(messageRepository.update).not.toHaveBeenCalled();
   });
 });

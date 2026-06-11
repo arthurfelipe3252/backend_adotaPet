@@ -24,7 +24,7 @@ import { CurrentUser } from '@identity/usuarios/infra/decorators/current-user.de
  * Autorização:
  *  - POST: usuário precisa ser participante da adoption_request
  *  - GET: lista só conversas onde o usuário é participante
- *  - GET /:id e PATCH /:id/active: ownership (participante)
+ *  - GET /:id, PATCH /:id/active, PATCH /:id/read: ownership (participante)
  */
 @ApiTags('Chat - Conversations')
 @ApiBearerAuth('access-token')
@@ -61,5 +61,19 @@ export class ConversationsController {
     @Body() dto: UpdateConversationActiveDto,
   ) {
     return this.service.updateStatus(id, user.id, user.tipoUsuario, dto);
+  }
+
+  /**
+   * Marca todas as mensagens RECEBIDAS dessa conversa como lidas.
+   * Mensagens enviadas pelo próprio usuário não são tocadas.
+   * Retorna `{ markedAsRead: N }`.
+   */
+  @Patch(':id/read')
+  @HttpCode(HttpStatus.OK)
+  async markAllAsRead(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.service.markAllAsRead(id, user.id, user.tipoUsuario);
   }
 }

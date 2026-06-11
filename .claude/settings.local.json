@@ -62,7 +62,8 @@
       "Bash(DATABASE_URL='postgresql://postgres:postgres@localhost:5432/adotapet' npx drizzle-kit generate --name=baseline)",
       "Bash(npx ts-node *)",
       "Bash(npm test *)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(git fetch *)"
     ]
   }
 }
