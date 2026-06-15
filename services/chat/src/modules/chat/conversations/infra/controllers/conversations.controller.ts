@@ -59,4 +59,13 @@ export class ConversationsController {
   ) {
     return this.service.updateStatus(id, user, dto);
   }
+
+  @Patch(':id/read')
+  @RequirePermissions(Permission.MESSAGES_WRITE)
+  async markAllAsRead(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: JwtUser,
+  ) {
+    return this.service.markAllAsRead(id, user);
+  }
 }

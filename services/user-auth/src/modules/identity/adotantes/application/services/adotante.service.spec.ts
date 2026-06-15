@@ -99,12 +99,18 @@ describe('AdotanteService', () => {
     compare: jest.fn(),
   };
 
+  const userMessaging = {
+    publishProfileCreated: jest.fn().mockResolvedValue(undefined),
+    publishProfileUpdated: jest.fn().mockResolvedValue(undefined),
+  };
+
   const service = new AdotanteService(
     drizzle as any,
     usuarioRepository as any,
     adotanteRepository as any,
     enderecoRepository as any,
     passwordHasher as any,
+    userMessaging as any,
   );
 
   beforeEach(() => jest.clearAllMocks());

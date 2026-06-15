@@ -55,6 +55,14 @@ describe('AuthService', () => {
     revokeAllForUser: jest.fn(),
   };
 
+  const adotanteRepository = {
+    buscarPorUsuarioId: jest.fn().mockResolvedValue(null),
+  };
+
+  const protetorOngRepository = {
+    buscarPorUsuarioId: jest.fn().mockResolvedValue(null),
+  };
+
   const jwtService = {
     sign: jest.fn().mockReturnValue('mock.access.token'),
   };
@@ -73,6 +81,8 @@ describe('AuthService', () => {
     usuarioRepository as any,
     passwordHasher as any,
     refreshTokenRepository as any,
+    adotanteRepository as any,
+    protetorOngRepository as any,
     jwtService as any,
     configService as any,
   );

@@ -29,6 +29,7 @@ import {
   USUARIO_REPOSITORY,
   type UsuarioRepository,
 } from '@identity/usuarios/domain/repositories/usuario-repository.interface';
+import { UserMessagingService } from '@identity/usuarios/application/services/user-messaging.service';
 
 /**
  * Service de aplicação do sub-módulo Protetores/ONGs.
@@ -48,6 +49,7 @@ export class ProtetorOngService {
     private readonly enderecoRepository: EnderecoRepository,
     @Inject(PASSWORD_HASHER)
     private readonly passwordHasher: PasswordHasher,
+    private readonly userMessaging: UserMessagingService,
   ) {}
 
   async criar(dto: CriarProtetorOngDto): Promise<ProtetorOngResponseDto> {
@@ -70,7 +72,7 @@ export class ProtetorOngService {
     const tipoUsuarioEnum =
       dto.tipoUsuario === 'protetor' ? TipoUsuario.Protetor : TipoUsuario.Ong;
 
-    return this.drizzle.db.transaction(async (tx) => {
+    const response = await this.drizzle.db.transaction(async (tx) => {
       // 1. Endereço (obrigatório no cadastro)
       const endereco = Endereco.criar({
         logradouro: dto.endereco.logradouro,
@@ -114,6 +116,15 @@ export class ProtetorOngService {
         endereco: enderecoSalvo,
       });
     });
+
+    // Após o commit: publica o resumo de perfil pros serviços que exibem o nome
+    // do protetor/ong (catalog/adoption/chat) materializarem a réplica local.
+    await this.userMessaging.publishProfileCreated({
+      id: response.id,
+      nome: dto.nome,
+      tipo: dto.tipoUsuario,
+    });
+    return response;
   }
 
   /**

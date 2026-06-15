@@ -11,7 +11,13 @@ import type {
 } from '../../domain/repositories/pet-repository.interface';
 import { PET_REPOSITORY } from '../../domain/repositories/pet-repository.interface';
 import { PetMessagingService } from './pet-messaging.service';
-import type { CreatePetDto, UpdatePetDto, PetResponseDto } from '../dto/pet.dto';
+import type { CreatePetDto, UpdatePetDto, PetResponseDto, ProfileSummary } from '../dto/pet.dto';
+import type { CatalogPetPayload } from '@shared/contracts/events/catalog-events.enum';
+import { PROFILE_REPOSITORY } from '@catalog/profiles/domain/repositories/profile-repository.interface';
+import type {
+  ProfileRepository,
+  ProfileView,
+} from '@catalog/profiles/domain/repositories/profile-repository.interface';
 
 @Injectable()
 export class PetService {
@@ -19,13 +25,48 @@ export class PetService {
     @Inject(PET_REPOSITORY)
     private readonly petRepository: PetRepository,
     private readonly petMessagingService: PetMessagingService,
+    @Inject(PROFILE_REPOSITORY)
+    private readonly profileRepository: ProfileRepository,
   ) {}
 
-  private mapToResponse(pet: Pet): PetResponseDto {
+  /** Converte o perfil replicado no resumo `{id, nome}` exposto na resposta. */
+  private toSummary(p: ProfileView | null | undefined): ProfileSummary | null {
+    return p ? { id: p.id, nome: p.nome } : null;
+  }
+
+  /**
+   * Projeta a entidade Pet no payload completo do evento (contrato compartilhado).
+   * Usado em create/update pra alimentar as réplicas dos consumidores (reports, match).
+   */
+  private toPetEvent(pet: Pet): CatalogPetPayload {
+    const now = new Date();
     return {
       id: pet.id!,
       protetorId: pet.protetorId,
-      protetor: null,
+      nome: pet.nome,
+      especie: pet.especie,
+      raca: pet.raca ?? null,
+      porte: pet.porte,
+      sexo: pet.sexo,
+      idadeMeses: pet.idadeMeses,
+      castrado: pet.castrado,
+      vacinado: pet.vacinado,
+      temperamento: pet.temperamento ?? null,
+      status: pet.status,
+      fotosUrls: pet.fotosUrls ?? [],
+      createdAt: (pet.createdAt ?? now).toISOString(),
+      updatedAt: (pet.updatedAt ?? now).toISOString(),
+    };
+  }
+
+  private mapToResponse(
+    pet: Pet,
+    protetor: ProfileSummary | null = null,
+  ): PetResponseDto {
+    return {
+      id: pet.id!,
+      protetorId: pet.protetorId,
+      protetor,
       nome: pet.nome,
       especie: pet.especie,
       raca: pet.raca ?? null,
@@ -46,28 +87,35 @@ export class PetService {
   async create(userId: string, dto: CreatePetDto): Promise<PetResponseDto> {
     const pet = Pet.create({ ...dto, protetorId: userId });
     const created = await this.petRepository.create(pet);
-    await this.petMessagingService.publishPetCreated({
-      id: created.id!,
-      nome: created.nome,
-      especie: created.especie,
-    });
-    return this.mapToResponse(created);
+    await this.petMessagingService.publishPetCreated(this.toPetEvent(created));
+    const protetor = await this.profileRepository.findById(created.protetorId);
+    return this.mapToResponse(created, this.toSummary(protetor));
   }
 
-  async findAll(filters?: PetFilters): Promise<PetResponseDto[]> {
-    const pets = await this.petRepository.findAll(filters);
-    return pets.map((p) => this.mapToResponse(p));
+  async findAll(
+    filters?: PetFilters,
+  ): Promise<{ rows: PetResponseDto[]; total: number }> {
+    const { rows, total } = await this.petRepository.findAll(filters);
+    const profiles = await this.profileRepository.findByIds([
+      ...new Set(rows.map((p) => p.protetorId)),
+    ]);
+    return {
+      rows: rows.map((p) => this.mapToResponse(p, this.toSummary(profiles.get(p.protetorId)))),
+      total,
+    };
   }
 
   async findById(id: string): Promise<PetResponseDto> {
     const pet = await this.petRepository.findById(id);
     if (!pet) throw new NotFoundException(`Pet ${id} não encontrado.`);
-    return this.mapToResponse(pet);
+    const protetor = await this.profileRepository.findById(pet.protetorId);
+    return this.mapToResponse(pet, this.toSummary(protetor));
   }
 
   async findByProtetor(protetorId: string): Promise<PetResponseDto[]> {
     const pets = await this.petRepository.findByProtetor(protetorId);
-    return pets.map((p) => this.mapToResponse(p));
+    const protetor = this.toSummary(await this.profileRepository.findById(protetorId));
+    return pets.map((p) => this.mapToResponse(p, protetor));
   }
 
   async update(id: string, userId: string, dto: UpdatePetDto): Promise<PetResponseDto> {
@@ -89,8 +137,9 @@ export class PetService {
     if (dto.fotosUrls !== undefined) pet.withFotosUrls(dto.fotosUrls ?? null);
 
     await this.petRepository.update(pet);
-    await this.petMessagingService.publishPetUpdated({ id: pet.id! });
-    return this.mapToResponse(pet);
+    await this.petMessagingService.publishPetUpdated(this.toPetEvent(pet));
+    const protetor = await this.profileRepository.findById(pet.protetorId);
+    return this.mapToResponse(pet, this.toSummary(protetor));
   }
 
   async delete(id: string, userId: string): Promise<void> {

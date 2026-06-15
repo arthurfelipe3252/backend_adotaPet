@@ -25,6 +25,7 @@ import { DashboardService } from '@reports/reporting-dashboard/application/servi
 
 interface JwtUser {
   sub: string;
+  protetorId: string;
   tipoUsuario: string;
   permissions: string[];
 }
@@ -47,7 +48,7 @@ export class ReportsController {
     @CurrentUser() user: JwtUser,
     @Query() query: DashboardQueryDto,
   ): Promise<DashboardResponseDto> {
-    const protetorId = this.dashboardService.resolveProtetorId(user.sub, user.tipoUsuario);
+    const protetorId = this.dashboardService.resolveProtetorId(user.protetorId, user.tipoUsuario);
     return this.dashboardService.getDashboard(protetorId, query);
   }
 
@@ -59,7 +60,7 @@ export class ReportsController {
   @ApiResponse({ status: 401, description: 'Token ausente ou inválido' })
   @ApiResponse({ status: 403, description: 'Usuário autenticado não é protetor nem ong' })
   async getKpis(@CurrentUser() user: JwtUser): Promise<KpisResponseDto> {
-    const protetorId = this.dashboardService.resolveProtetorId(user.sub, user.tipoUsuario);
+    const protetorId = this.dashboardService.resolveProtetorId(user.protetorId, user.tipoUsuario);
     return this.dashboardService.getKpis(protetorId);
   }
 
@@ -75,7 +76,7 @@ export class ReportsController {
     @CurrentUser() user: JwtUser,
     @Query() query: TimelineQueryDto,
   ): Promise<TimelinePointDto[]> {
-    const protetorId = this.dashboardService.resolveProtetorId(user.sub, user.tipoUsuario);
+    const protetorId = this.dashboardService.resolveProtetorId(user.protetorId, user.tipoUsuario);
     return this.dashboardService.getAdoptionsTimeline(protetorId, query.months ?? 12);
   }
 
@@ -91,7 +92,7 @@ export class ReportsController {
     @CurrentUser() user: JwtUser,
     @Query() query: TimelineQueryDto,
   ): Promise<TimelinePointDto[]> {
-    const protetorId = this.dashboardService.resolveProtetorId(user.sub, user.tipoUsuario);
+    const protetorId = this.dashboardService.resolveProtetorId(user.protetorId, user.tipoUsuario);
     return this.dashboardService.getRequestsTimeline(protetorId, query.months ?? 12);
   }
 
@@ -107,7 +108,7 @@ export class ReportsController {
     @CurrentUser() user: JwtUser,
     @Query() query: FunnelQueryDto,
   ): Promise<FunnelResponseDto> {
-    const protetorId = this.dashboardService.resolveProtetorId(user.sub, user.tipoUsuario);
+    const protetorId = this.dashboardService.resolveProtetorId(user.protetorId, user.tipoUsuario);
     return this.dashboardService.getFunnel(protetorId, query.from, query.to);
   }
 
@@ -123,7 +124,7 @@ export class ReportsController {
     @CurrentUser() user: JwtUser,
     @Query() query: TopPetsQueryDto,
   ): Promise<TopPetDto[]> {
-    const protetorId = this.dashboardService.resolveProtetorId(user.sub, user.tipoUsuario);
+    const protetorId = this.dashboardService.resolveProtetorId(user.protetorId, user.tipoUsuario);
     return this.dashboardService.getTopPets(protetorId, query.limit ?? 5);
   }
 
@@ -139,7 +140,7 @@ export class ReportsController {
     @CurrentUser() user: JwtUser,
     @Query() query: StalePetsQueryDto,
   ): Promise<StalePetDto[]> {
-    const protetorId = this.dashboardService.resolveProtetorId(user.sub, user.tipoUsuario);
+    const protetorId = this.dashboardService.resolveProtetorId(user.protetorId, user.tipoUsuario);
     return this.dashboardService.getStalePets(protetorId, query.days ?? 30);
   }
 }

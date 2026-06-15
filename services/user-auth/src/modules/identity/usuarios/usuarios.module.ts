@@ -10,6 +10,13 @@ import { UsuariosController } from '@identity/usuarios/infra/controllers/usuario
 import { DrizzleRefreshTokenRepository } from '@identity/usuarios/infra/repositories/drizzle-refresh-token.repository';
 import { DrizzleUsuarioRepository } from '@identity/usuarios/infra/repositories/drizzle-usuario.repository';
 import { BcryptPasswordHasher } from '@identity/usuarios/infra/security/bcrypt-password-hasher';
+// Repos de perfil providos localmente (sem importar os módulos — evita ciclo,
+// pois Adotantes/ProtetoresOngsModule importam UsuariosModule). Só dependem do
+// DrizzleService global. Usados pelo AuthService pra embutir o id de perfil no JWT.
+import { ADOTANTE_REPOSITORY } from '@identity/adotantes/domain/repositories/adotante-repository.interface';
+import { DrizzleAdotanteRepository } from '@identity/adotantes/infra/repositories/drizzle-adotante.repository';
+import { PROTETOR_ONG_REPOSITORY } from '@identity/protetores_ongs/domain/repositories/protetor-ong-repository.interface';
+import { DrizzleProtetorOngRepository } from '@identity/protetores_ongs/infra/repositories/drizzle-protetor-ong.repository';
 
 @Module({
   controllers: [UsuariosController, AuthController],
@@ -23,6 +30,10 @@ import { BcryptPasswordHasher } from '@identity/usuarios/infra/security/bcrypt-p
     { provide: REFRESH_TOKEN_REPOSITORY, useExisting: DrizzleRefreshTokenRepository },
     BcryptPasswordHasher,
     { provide: PASSWORD_HASHER, useExisting: BcryptPasswordHasher },
+    DrizzleAdotanteRepository,
+    { provide: ADOTANTE_REPOSITORY, useExisting: DrizzleAdotanteRepository },
+    DrizzleProtetorOngRepository,
+    { provide: PROTETOR_ONG_REPOSITORY, useExisting: DrizzleProtetorOngRepository },
   ],
   exports: [
     USUARIO_REPOSITORY,
@@ -30,6 +41,7 @@ import { BcryptPasswordHasher } from '@identity/usuarios/infra/security/bcrypt-p
     PASSWORD_HASHER,
     UsuarioService,
     AuthService,
+    UserMessagingService,
   ],
 })
 export class UsuariosModule {}

@@ -1,6 +1,10 @@
 import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
 import { SharedMessagingService } from '@shared/infra/messaging/shared-messaging.service';
-import { UserAuthExchangeName, UserAuthRoutingKey } from '@shared/contracts/events/user-auth-events.enum';
+import {
+  UserAuthExchangeName,
+  UserAuthRoutingKey,
+  type UserAuthProfilePayload,
+} from '@shared/contracts/events/user-auth-events.enum';
 
 @Injectable()
 export class UserMessagingService implements OnApplicationBootstrap {
@@ -14,7 +18,8 @@ export class UserMessagingService implements OnApplicationBootstrap {
     ]);
   }
 
-  async publishUserCreated(payload: { id: string; email: string; tipoUsuario: string }): Promise<void> {
+  /** Publica o resumo de perfil (id de PERFIL + nome + tipo) na criação. */
+  async publishProfileCreated(payload: UserAuthProfilePayload): Promise<void> {
     await this.sharedMessagingService.publish(
       UserAuthExchangeName.USER_CREATED,
       UserAuthRoutingKey.USER_CREATED,
@@ -22,7 +27,8 @@ export class UserMessagingService implements OnApplicationBootstrap {
     );
   }
 
-  async publishUserUpdated(payload: { id: string; email: string }): Promise<void> {
+  /** Publica o resumo de perfil atualizado (ex.: nome alterado em PATCH /me). */
+  async publishProfileUpdated(payload: UserAuthProfilePayload): Promise<void> {
     await this.sharedMessagingService.publish(
       UserAuthExchangeName.USER_UPDATED,
       UserAuthRoutingKey.USER_UPDATED,

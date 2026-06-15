@@ -29,6 +29,7 @@ import {
   USUARIO_REPOSITORY,
   type UsuarioRepository,
 } from '@identity/usuarios/domain/repositories/usuario-repository.interface';
+import { UserMessagingService } from '@identity/usuarios/application/services/user-messaging.service';
 
 /**
  * Service de aplicação do sub-módulo Adotantes.
@@ -49,6 +50,7 @@ export class AdotanteService {
     private readonly enderecoRepository: EnderecoRepository,
     @Inject(PASSWORD_HASHER)
     private readonly passwordHasher: PasswordHasher,
+    private readonly userMessaging: UserMessagingService,
   ) {}
 
   async criar(dto: CriarAdotanteDto): Promise<AdotanteResponseDto> {
@@ -67,7 +69,7 @@ export class AdotanteService {
     const senhaHash = await this.passwordHasher.hash(dto.senha);
 
     // ── Transação atômica ───────────────────────────────────────────────
-    return this.drizzle.db.transaction(async (tx) => {
+    const response = await this.drizzle.db.transaction(async (tx) => {
       // 1. Endereço (obrigatório no cadastro)
       const endereco = Endereco.criar({
         logradouro: dto.endereco.logradouro,
@@ -105,6 +107,15 @@ export class AdotanteService {
         endereco: enderecoSalvo,
       });
     });
+
+    // Após o commit: publica o resumo de perfil pros serviços que exibem o nome
+    // do adotante (adoption/chat) materializarem a réplica local.
+    await this.userMessaging.publishProfileCreated({
+      id: response.id,
+      nome: dto.nome,
+      tipo: 'adotante',
+    });
+    return response;
   }
 
   /**

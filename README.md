@@ -21,7 +21,7 @@ Monorepo de microsserviços NestJS com Clean Architecture e DDD. Cada serviço p
 
 | Publicador | Evento | Consumidor |
 |---|---|---|
-| `catalog` | `pet.created`, `pet.updated`, `pet.deleted` | `reports` (materializa dados locais) |
+| `catalog` | `pet.created`, `pet.updated`, `pet.deleted` | `reports` (materializa dados locais), `match` (réplica local pra scoring) |
 | `adoption` | `adoption-request.created`, `adoption-request.updated` | `chat` (abre conversa ao aprovar), `reports` |
 | `chat` | `conversation.created`, `message.created` | `reports` |
 
@@ -128,7 +128,7 @@ docker compose up --build
 
 ## Testes
 
-**22 suites · 178 testes unitários** cobrindo todos os serviços.
+**23 suites · 183 testes unitários** cobrindo todos os serviços.
 
 ```bash
 # Dentro de cada serviço
@@ -145,9 +145,9 @@ npm run test:cov      # com coverage
 | catalog | 2 | 20 |
 | adoption | 2 | 19 |
 | chat | 4 | 28 |
-| match | 3 | 24 |
+| match | 4 | 29 |
 | reports | 3 | 30 |
-| **Total** | **22** | **178** |
+| **Total** | **23** | **183** |
 
 Documentação completa dos testes: [docs/TESTS.md](docs/TESTS.md)
 

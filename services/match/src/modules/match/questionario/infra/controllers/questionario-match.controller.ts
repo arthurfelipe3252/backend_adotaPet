@@ -18,6 +18,7 @@ import { SalvarQuestionarioDto } from '@match/questionario/application/dto/quest
 
 interface JwtUser {
   sub: string;
+  adotanteId: string;
   tipoUsuario: string;
   permissions: string[];
 }

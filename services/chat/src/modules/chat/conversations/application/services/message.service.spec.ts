@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { MessageService } from '@chat/conversations/application/services/message.service';
 import { Message } from '@chat/conversations/domain/models/message.entity';
 import { Conversation } from '@chat/conversations/domain/models/conversation.entity';
@@ -12,9 +8,9 @@ const adopterUserId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const protetorUserId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
 const outroUserId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
 
-const adopterJwt = { sub: adopterUserId, tipoUsuario: 'adotante', permissions: [] };
-const protetorJwt = { sub: protetorUserId, tipoUsuario: 'protetor', permissions: [] };
-const outroJwt = { sub: outroUserId, tipoUsuario: 'adotante', permissions: [] };
+const adopterJwt = { sub: adopterUserId, adotanteId: adopterUserId, tipoUsuario: 'adotante', permissions: [] };
+const protetorJwt = { sub: protetorUserId, protetorId: protetorUserId, tipoUsuario: 'protetor', permissions: [] };
+const outroJwt = { sub: outroUserId, adotanteId: outroUserId, tipoUsuario: 'adotante', permissions: [] };
 
 const buildConversation = () =>
   Conversation.restore({
@@ -48,7 +44,18 @@ describe('MessageService', () => {
     publishConversationCreated: jest.fn().mockResolvedValue(undefined),
   };
 
-  const service = new MessageService(messageRepository, conversationRepository, chatMessaging as any);
+  const profileRepository = {
+    upsert: jest.fn().mockResolvedValue(undefined),
+    findById: jest.fn().mockResolvedValue(null),
+    findByIds: jest.fn().mockResolvedValue(new Map()),
+  };
+
+  const service = new MessageService(
+    messageRepository as any,
+    conversationRepository as any,
+    profileRepository as any,
+    chatMessaging as any,
+  );
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -164,7 +171,7 @@ describe('MessageService', () => {
     const message = Message.restore({
       id: '66666666-6666-6666-6666-666666666666',
       conversationId,
-      senderId: protetorId,
+      senderId: protetorUserId,
       content: 'Ping do protetor',
       isRead: false,
       createdAt: new Date('2026-05-18T11:00:00.000Z'),
@@ -194,28 +201,30 @@ describe('MessageService', () => {
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('refuses to mark own message as read (400)', async () => {
-    // Adotante tentando marcar uma mensagem que ele próprio enviou.
-    const ownMessage = Message.restore({
-      id: '88888888-8888-8888-8888-888888888888',
-      conversationId,
-      senderId: adopterId,
-      content: 'mensagem própria',
-      isRead: false,
-      createdAt: new Date('2026-05-18T11:00:00.000Z'),
-      updatedAt: new Date('2026-05-18T11:00:00.000Z'),
-    })!;
-    messageRepository.findById.mockResolvedValue(ownMessage);
+  it('populates sender summary with tipo derived by position', async () => {
     conversationRepository.findById.mockResolvedValue(buildConversation());
 
-    await expect(
-      service.updateReadStatus(
-        ownMessage.id!,
-        adopterUsuarioId,
-        TipoUsuario.Adotante,
-        { isRead: true },
-      ),
-    ).rejects.toBeInstanceOf(BadRequestException);
-    expect(messageRepository.update).not.toHaveBeenCalled();
+    const message = Message.restore({
+      id: '55555555-5555-5555-5555-555555555555',
+      conversationId,
+      senderId: protetorUserId,
+      content: 'Oi',
+      isRead: true,
+      createdAt: new Date('2026-05-18T10:00:00.000Z'),
+      updatedAt: new Date('2026-05-18T10:00:00.000Z'),
+    })!;
+    messageRepository.findByConversation.mockResolvedValue([message]);
+    profileRepository.findByIds.mockResolvedValue(
+      new Map([[protetorUserId, { id: protetorUserId, nome: 'ONG Patas', tipo: 'protetor' }]]),
+    );
+
+    const result = await service.findByConversation(conversationId, adopterJwt, {});
+
+    expect(result[0].sender).toEqual({
+      id: protetorUserId,
+      nome: 'ONG Patas',
+      tipo: 'protetor',
+    });
   });
+
 });

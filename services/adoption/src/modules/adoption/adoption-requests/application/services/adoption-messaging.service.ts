@@ -14,7 +14,15 @@ export class AdoptionMessagingService implements OnApplicationBootstrap {
     ]);
   }
 
-  async publishRequestCreated(payload: { id: string; adopterId: string }): Promise<void> {
+  async publishRequestCreated(payload: {
+    id: string;
+    petId: string;
+    protetorId: string;
+    adopterId: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  }): Promise<void> {
     await this.sharedMessagingService.publish(
       AdoptionExchangeName.REQUEST_CREATED,
       AdoptionRoutingKey.REQUEST_CREATED,
@@ -27,6 +35,7 @@ export class AdoptionMessagingService implements OnApplicationBootstrap {
     status: string;
     adopterId?: string;
     protetorId?: string;
+    updatedAt?: string;
   }): Promise<void> {
     await this.sharedMessagingService.publish(
       AdoptionExchangeName.REQUEST_UPDATED,

@@ -1,6 +1,10 @@
 import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
 import { SharedMessagingService } from '@shared/infra/messaging/shared-messaging.service';
-import { CatalogExchangeName, CatalogRoutingKey } from '@shared/contracts/events/catalog-events.enum';
+import {
+  CatalogExchangeName,
+  CatalogRoutingKey,
+  type CatalogPetPayload,
+} from '@shared/contracts/events/catalog-events.enum';
 
 @Injectable()
 export class PetMessagingService implements OnApplicationBootstrap {
@@ -14,7 +18,7 @@ export class PetMessagingService implements OnApplicationBootstrap {
     ]);
   }
 
-  async publishPetCreated(payload: { id: string; nome: string; especie: string }): Promise<void> {
+  async publishPetCreated(payload: CatalogPetPayload): Promise<void> {
     await this.sharedMessagingService.publish(
       CatalogExchangeName.PET_CREATED,
       CatalogRoutingKey.PET_CREATED,
@@ -22,7 +26,7 @@ export class PetMessagingService implements OnApplicationBootstrap {
     );
   }
 
-  async publishPetUpdated(payload: { id: string }): Promise<void> {
+  async publishPetUpdated(payload: CatalogPetPayload): Promise<void> {
     await this.sharedMessagingService.publish(
       CatalogExchangeName.PET_UPDATED,
       CatalogRoutingKey.PET_UPDATED,

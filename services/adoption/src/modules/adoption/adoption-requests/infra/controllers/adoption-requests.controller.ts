@@ -22,6 +22,8 @@ import { Permission } from '@shared/domain/enums/permission.enum';
 
 interface JwtUser {
   sub: string;
+  adotanteId: string;
+  protetorId: string;
   tipoUsuario: string;
   permissions: string[];
 }

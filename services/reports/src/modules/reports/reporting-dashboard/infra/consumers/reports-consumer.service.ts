@@ -99,7 +99,7 @@ export class ReportsConsumerService implements OnApplicationBootstrap {
         await this.drizzle.db.insert(reportAdoptionRequestsSchema).values({
           id: p.id, petId: p.petId, protetorId: p.protetorId ?? null,
           adopterId: p.adopterId, status: p.status,
-          createdAt: new Date(p.createdAt), updatedAt: new Date(p.updatedAt),
+          createdAt: this.parseDate(p.createdAt), updatedAt: this.parseDate(p.updatedAt),
         }).onConflictDoNothing();
       },
     );
@@ -118,7 +118,7 @@ export class ReportsConsumerService implements OnApplicationBootstrap {
           .set({
             status: p.status,
             ...(p.protetorId && { protetorId: p.protetorId }),
-            updatedAt: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+            updatedAt: this.parseDate(p.updatedAt),
           })
           .where(eq(reportAdoptionRequestsSchema.id, p.id));
       },
@@ -158,5 +158,11 @@ export class ReportsConsumerService implements OnApplicationBootstrap {
         }).onConflictDoNothing();
       },
     );
+  }
+
+  /** Parse robusto de timestamp do payload — cai pra agora se ausente/inválido. */
+  private parseDate(value?: string): Date {
+    const d = value ? new Date(value) : null;
+    return d && !Number.isNaN(d.getTime()) ? d : new Date();
   }
 }

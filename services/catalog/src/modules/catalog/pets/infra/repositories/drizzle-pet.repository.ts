@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { eq, and, SQL } from 'drizzle-orm';
+import { eq, and, count, SQL } from 'drizzle-orm';
 import { DrizzleService } from '@shared/infra/database/drizzle.service';
 import { Pet } from '../../domain/models/pet.entity';
 import {
@@ -97,7 +97,7 @@ export class DrizzlePetRepository implements PetRepository {
     await this.drizzle.db.delete(petsSchema).where(eq(petsSchema.id, id));
   }
 
-  async findAll(filters?: PetFilters): Promise<Pet[]> {
+  async findAll(filters?: PetFilters): Promise<{ rows: Pet[]; total: number }> {
     const conditions: SQL[] = [];
 
     if (filters?.especie)
@@ -109,12 +109,21 @@ export class DrizzlePetRepository implements PetRepository {
     if (filters?.protetorId)
       conditions.push(eq(petsSchema.protetorId, filters.protetorId));
 
-    const rows = await this.drizzle.db
-      .select()
-      .from(petsSchema)
-      .where(conditions.length > 0 ? and(...conditions) : undefined);
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-    return rows.map((r) => this.toEntity(r));
+    // Contagem completa do filtro (independe do recorte de paginação).
+    const [{ value: total }] = await this.drizzle.db
+      .select({ value: count() })
+      .from(petsSchema)
+      .where(where);
+
+    // Recorte paginado. $dynamic() permite aplicar limit/offset condicionalmente.
+    let query = this.drizzle.db.select().from(petsSchema).where(where).$dynamic();
+    if (filters?.limit !== undefined) query = query.limit(filters.limit);
+    if (filters?.offset !== undefined) query = query.offset(filters.offset);
+    const rows = await query;
+
+    return { rows: rows.map((r) => this.toEntity(r)), total: Number(total) };
   }
 
   async findById(id: string): Promise<Pet | null> {

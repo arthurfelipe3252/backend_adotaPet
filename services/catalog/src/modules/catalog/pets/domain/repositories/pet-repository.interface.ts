@@ -8,13 +8,16 @@ export interface PetFilters {
   status?: PetStatus;
   castrado?: boolean;
   protetorId?: string;
+  limit?: number;
+  offset?: number;
 }
 
 export interface PetRepository {
   create(pet: Pet): Promise<Pet>;
   update(pet: Pet): Promise<void>;
   delete(id: string): Promise<void>;
-  findAll(filters?: PetFilters): Promise<Pet[]>;
+  /** Lista paginada: `rows` já fatiada por limit/offset; `total` é a contagem completa do filtro. */
+  findAll(filters?: PetFilters): Promise<{ rows: Pet[]; total: number }>;
   findById(id: string): Promise<Pet | null>;
   findByProtetor(protetorId: string): Promise<Pet[]>;
 }

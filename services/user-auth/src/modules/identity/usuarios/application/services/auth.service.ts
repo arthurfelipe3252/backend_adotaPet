@@ -5,6 +5,14 @@ import { createHash, randomBytes } from 'node:crypto';
 import { paraSegundos } from '@shared/utils/duration.util';
 import { Permission } from '@shared/domain/enums/permission.enum';
 import { TipoUsuario } from '@identity/usuarios/domain/enums/tipo-usuario.enum';
+import {
+  ADOTANTE_REPOSITORY,
+  type AdotanteRepository,
+} from '@identity/adotantes/domain/repositories/adotante-repository.interface';
+import {
+  PROTETOR_ONG_REPOSITORY,
+  type ProtetorOngRepository,
+} from '@identity/protetores_ongs/domain/repositories/protetor-ong-repository.interface';
 import { AuthResponseDto } from '@identity/usuarios/application/dto/auth-response.dto';
 import { LoginDto } from '@identity/usuarios/application/dto/login.dto';
 import { RefreshTokenDto } from '@identity/usuarios/application/dto/refresh-token.dto';
@@ -60,6 +68,10 @@ export class AuthService {
     @Inject(PASSWORD_HASHER) private readonly passwordHasher: PasswordHasher,
     @Inject(REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepository: RefreshTokenRepository,
+    @Inject(ADOTANTE_REPOSITORY)
+    private readonly adotanteRepository: AdotanteRepository,
+    @Inject(PROTETOR_ONG_REPOSITORY)
+    private readonly protetorOngRepository: ProtetorOngRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -86,7 +98,7 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
-    const tokenPair = this.generateTokenPair(usuario, meta);
+    const tokenPair = await this.generateTokenPair(usuario, meta);
     await this.refreshTokenRepository.create(tokenPair.refreshTokenEntity);
 
     return this.buildAuthResponse(usuario, tokenPair);
@@ -111,7 +123,7 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token inválido');
     }
 
-    const tokenPair = this.generateTokenPair(usuario, meta);
+    const tokenPair = await this.generateTokenPair(usuario, meta);
 
     // Operação atômica: revoga o antigo + insere o novo na mesma transação.
     // Se duas requests chegarem ao mesmo tempo com o mesmo refresh token,
@@ -167,10 +179,31 @@ export class AuthService {
    * login() e refresh(), e deixa explícito que ambos os fluxos produzem
    * o mesmo tipo de credencial.
    */
-  private generateTokenPair(usuario: Usuario, meta: LoginMeta): TokenPair {
+  private async generateTokenPair(
+    usuario: Usuario,
+    meta: LoginMeta,
+  ): Promise<TokenPair> {
     const accessExpiresInSeconds = paraSegundos(
       this.configService.get<string>('JWT_ACCESS_EXPIRES_IN') ?? '1d',
     );
+
+    // Resolve o id de PERFIL (adotantes.id / protetores_ongs.id) e embute no JWT.
+    // Os demais serviços usam esse id como identidade de dono — NÃO o usuarios.id
+    // (que continua em `sub`). Sem isso, cada serviço teria que consultar o
+    // user-auth pra mapear usuario→perfil.
+    let adotanteId: string | undefined;
+    let protetorId: string | undefined;
+    if (usuario.tipoUsuario === TipoUsuario.Adotante) {
+      adotanteId = (await this.adotanteRepository.buscarPorUsuarioId(usuario.id!))
+        ?.id;
+    } else if (
+      usuario.tipoUsuario === TipoUsuario.Protetor ||
+      usuario.tipoUsuario === TipoUsuario.Ong
+    ) {
+      protetorId = (
+        await this.protetorOngRepository.buscarPorUsuarioId(usuario.id!)
+      )?.id;
+    }
 
     const accessToken = this.jwtService.sign(
       {
@@ -178,6 +211,8 @@ export class AuthService {
         email: usuario.email,
         tipoUsuario: usuario.tipoUsuario,
         permissions: this.resolvePermissions(usuario.tipoUsuario),
+        ...(adotanteId && { adotanteId }),
+        ...(protetorId && { protetorId }),
       },
       { expiresIn: accessExpiresInSeconds },
     );

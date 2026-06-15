@@ -1,4 +1,8 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { Conversation } from '@chat/conversations/domain/models/conversation.entity';
 
@@ -8,9 +12,9 @@ const otherId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
 const conversationId = 'dddddddd-dddd-dddd-dddd-dddddddddddd';
 const adoptionRequestId = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
 
-const adotanteJwt = { sub: adopterId, tipoUsuario: 'adotante' };
-const protetorJwt = { sub: protetorId, tipoUsuario: 'protetor' };
-const outroJwt = { sub: otherId, tipoUsuario: 'adotante' };
+const adotanteJwt = { sub: adopterId, adotanteId: adopterId, tipoUsuario: 'adotante' };
+const protetorJwt = { sub: protetorId, protetorId, tipoUsuario: 'protetor' };
+const outroJwt = { sub: otherId, adotanteId: otherId, tipoUsuario: 'adotante' };
 
 const buildConversation = (isActive = true) =>
   Conversation.restore({
@@ -37,7 +41,24 @@ describe('ConversationService', () => {
     publishMessageCreated: jest.fn().mockResolvedValue(undefined),
   };
 
-  const service = new ConversationService(repository as any, chatMessaging as any);
+  const messageRepository = {
+    countUnreadByConversationForViewer: jest.fn().mockResolvedValue(new Map()),
+    findLastMessageByConversation: jest.fn().mockResolvedValue(new Map()),
+    markAllAsReadInConversation: jest.fn().mockResolvedValue(0),
+  };
+
+  const profileRepository = {
+    upsert: jest.fn().mockResolvedValue(undefined),
+    findById: jest.fn().mockResolvedValue(null),
+    findByIds: jest.fn().mockResolvedValue(new Map()),
+  };
+
+  const service = new ConversationService(
+    repository as any,
+    messageRepository as any,
+    profileRepository as any,
+    chatMessaging as any,
+  );
 
   beforeEach(() => jest.clearAllMocks());
 
@@ -56,19 +77,13 @@ describe('ConversationService', () => {
       expect(result.id).toBe(conversationId);
     });
 
-    it('creates new conversation and publishes event', async () => {
+    it('throws BadRequestException when no conversation exists yet (criada na aprovação)', async () => {
       repository.findByAdoptionRequestId.mockResolvedValue(null);
-      const created = buildConversation();
-      repository.create.mockResolvedValue(created);
 
-      const result = await service.create(adotanteJwt, {
-        adoptionRequestId,
-        protetorId,
-      } as any);
-
-      expect(repository.create).toHaveBeenCalledTimes(1);
-      expect(chatMessaging.publishConversationCreated).toHaveBeenCalledTimes(1);
-      expect(result.id).toBe(conversationId);
+      await expect(
+        service.create(adotanteJwt, { adoptionRequestId } as any),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(repository.create).not.toHaveBeenCalled();
     });
   });
 
@@ -142,6 +157,21 @@ describe('ConversationService', () => {
       const result = await service.findById(conversationId, protetorJwt);
 
       expect(result.id).toBe(conversationId);
+    });
+
+    it('populates adopter/protetor summaries from the profile replica', async () => {
+      repository.findById.mockResolvedValue(buildConversation());
+      profileRepository.findByIds.mockResolvedValue(
+        new Map([
+          [adopterId, { id: adopterId, nome: 'Ana', tipo: 'adotante' }],
+          [protetorId, { id: protetorId, nome: 'ONG Patas', tipo: 'protetor' }],
+        ]),
+      );
+
+      const result = await service.findById(conversationId, adotanteJwt);
+
+      expect(result.adopter).toEqual({ id: adopterId, nome: 'Ana' });
+      expect(result.protetor).toEqual({ id: protetorId, nome: 'ONG Patas' });
     });
   });
 

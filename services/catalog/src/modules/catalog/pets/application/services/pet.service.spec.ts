@@ -42,7 +42,17 @@ describe('PetService', () => {
     publishPetDeleted: jest.fn().mockResolvedValue(undefined),
   };
 
-  const service = new PetService(petRepository as any, petMessagingService as any);
+  const profileRepository = {
+    upsert: jest.fn(),
+    findById: jest.fn().mockResolvedValue(null),
+    findByIds: jest.fn().mockResolvedValue(new Map()),
+  };
+
+  const service = new PetService(
+    petRepository as any,
+    petMessagingService as any,
+    profileRepository as any,
+  );
 
   beforeEach(() => jest.clearAllMocks());
 
@@ -73,17 +83,18 @@ describe('PetService', () => {
   });
 
   describe('findAll', () => {
-    it('returns mapped list', async () => {
-      petRepository.findAll.mockResolvedValue([buildPet()]);
+    it('returns paginated { rows, total }', async () => {
+      petRepository.findAll.mockResolvedValue({ rows: [buildPet()], total: 1 });
 
       const result = await service.findAll();
 
-      expect(result).toHaveLength(1);
-      expect(result[0].id).toBe(petId);
+      expect(result.rows).toHaveLength(1);
+      expect(result.total).toBe(1);
+      expect(result.rows[0].id).toBe(petId);
     });
 
     it('passes filters to repository', async () => {
-      petRepository.findAll.mockResolvedValue([]);
+      petRepository.findAll.mockResolvedValue({ rows: [], total: 0 });
 
       await service.findAll({ especie: 'gato' } as any);
 
@@ -143,7 +154,9 @@ describe('PetService', () => {
       const result = await service.update(petId, userId, { nome: 'Max' });
 
       expect(petRepository.update).toHaveBeenCalledTimes(1);
-      expect(petMessagingService.publishPetUpdated).toHaveBeenCalledWith({ id: petId });
+      expect(petMessagingService.publishPetUpdated).toHaveBeenCalledWith(
+        expect.objectContaining({ id: petId, nome: 'Max' }),
+      );
       expect(result.nome).toBe('Max');
     });
   });

@@ -1,6 +1,9 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { AdoptionRequestService } from './adoption-request.service';
-import { AdoptionRequest } from '@adoption/adoption-requests/domain/models/adoption-request.entity';
+import {
+  AdoptionRequest,
+  type AdoptionRequestStatus,
+} from '@adoption/adoption-requests/domain/models/adoption-request.entity';
 
 const adopterId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const protetorId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
@@ -8,14 +11,14 @@ const otherId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
 const petId = 'dddddddd-dddd-dddd-dddd-dddddddddddd';
 const requestId = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
 
-const adotanteJwt = { sub: adopterId, tipoUsuario: 'adotante', permissions: [] };
-const protetorJwt = { sub: protetorId, tipoUsuario: 'protetor', permissions: [] };
-const outroAdotanteJwt = { sub: otherId, tipoUsuario: 'adotante', permissions: [] };
+const adotanteJwt = { sub: adopterId, adotanteId: adopterId, tipoUsuario: 'adotante', permissions: [] };
+const protetorJwt = { sub: protetorId, protetorId, tipoUsuario: 'protetor', permissions: [] };
+const outroAdotanteJwt = { sub: otherId, adotanteId: otherId, tipoUsuario: 'adotante', permissions: [] };
 
 const buildRequest = (overrides: Partial<{
   adopterId: string;
   protetorId: string | null;
-  status: string;
+  status: AdoptionRequestStatus;
 }> = {}) =>
   AdoptionRequest.restore({
     id: requestId,
@@ -45,7 +48,24 @@ describe('AdoptionRequestService', () => {
     publishRequestUpdated: jest.fn().mockResolvedValue(undefined),
   };
 
-  const service = new AdoptionRequestService(repository as any, messagingService as any);
+  const adoptionPetRepository = {
+    upsert: jest.fn(),
+    deleteById: jest.fn(),
+    findProtetorIdByPetId: jest.fn().mockResolvedValue(protetorId),
+  };
+
+  const profileRepository = {
+    upsert: jest.fn(),
+    findById: jest.fn().mockResolvedValue(null),
+    findByIds: jest.fn().mockResolvedValue(new Map()),
+  };
+
+  const service = new AdoptionRequestService(
+    repository as any,
+    messagingService as any,
+    adoptionPetRepository as any,
+    profileRepository as any,
+  );
 
   beforeEach(() => jest.clearAllMocks());
 
@@ -61,10 +81,9 @@ describe('AdoptionRequestService', () => {
       } as any);
 
       expect(repository.create).toHaveBeenCalledTimes(1);
-      expect(messagingService.publishRequestCreated).toHaveBeenCalledWith({
-        id: requestId,
-        adopterId,
-      });
+      expect(messagingService.publishRequestCreated).toHaveBeenCalledWith(
+        expect.objectContaining({ id: requestId, adopterId }),
+      );
       expect(result.id).toBe(requestId);
     });
   });

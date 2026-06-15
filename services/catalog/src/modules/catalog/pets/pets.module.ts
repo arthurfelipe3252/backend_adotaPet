@@ -4,6 +4,9 @@ import { PetMessagingService } from './application/services/pet-messaging.servic
 import { DrizzlePetRepository } from './infra/repositories/drizzle-pet.repository';
 import { PetsController } from './infra/controllers/pets.controller';
 import { PET_REPOSITORY } from './domain/repositories/pet-repository.interface';
+import { DrizzleProfileRepository } from '@catalog/profiles/infra/repositories/drizzle-profile.repository';
+import { PROFILE_REPOSITORY } from '@catalog/profiles/domain/repositories/profile-repository.interface';
+import { UserAuthEventConsumer } from '@catalog/profiles/infra/consumers/user-auth-event-consumer.service';
 
 @Module({
   controllers: [PetsController],
@@ -15,6 +18,13 @@ import { PET_REPOSITORY } from './domain/repositories/pet-repository.interface';
       provide: PET_REPOSITORY,
       useExisting: DrizzlePetRepository,
     },
+    // Réplica de perfis (alimentada por eventos do user-auth) → popula pet.protetor
+    DrizzleProfileRepository,
+    {
+      provide: PROFILE_REPOSITORY,
+      useExisting: DrizzleProfileRepository,
+    },
+    UserAuthEventConsumer,
   ],
   exports: [PetService, PET_REPOSITORY, DrizzlePetRepository],
 })

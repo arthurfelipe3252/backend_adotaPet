@@ -2,7 +2,7 @@ import { ReportsController } from './reports.controller';
 import { ForbiddenException } from '@nestjs/common';
 
 const protetorId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-const protetorJwt = { sub: protetorId, tipoUsuario: 'protetor', permissions: [] };
+const protetorJwt = { sub: protetorId, protetorId, tipoUsuario: 'protetor', permissions: [] };
 const adotanteJwt = { sub: 'other-id', tipoUsuario: 'adotante', permissions: [] };
 const mockKpis = { petsDisponivel: 3, conversasAtivas: 2 };
 const mockDashboard = { kpis: mockKpis, adoptionsTimeline: [], requestsTimeline: [], funnel: {}, topPets: [], stalePets: [] };

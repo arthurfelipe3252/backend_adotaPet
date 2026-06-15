@@ -26,6 +26,7 @@ import type { Especie, Porte, PetStatus } from '../../domain/models/pet.entity';
 
 interface JwtUser {
   sub: string;
+  protetorId: string;
   permissions: string[];
 }
 
@@ -54,6 +55,8 @@ export class PetsController {
     @Query('_page', new DefaultValuePipe(1), ParseIntPipe) _page?: number,
     @Query('_size', new DefaultValuePipe(10), ParseIntPipe) _size?: number,
   ) {
+    const size = _size ?? 10;
+    const page = _page ?? 1;
     const filters: PetFilters = {
       especie,
       porte,
@@ -61,6 +64,8 @@ export class PetsController {
       protetorId,
       castrado:
         castrado === 'true' ? true : castrado === 'false' ? false : undefined,
+      limit: size,
+      offset: (page - 1) * size,
     };
     return this.petService.findAll(filters);
   }
@@ -90,7 +95,7 @@ export class PetsController {
   @HttpCode(HttpStatus.CREATED)
   @RequirePermissions(Permission.PETS_WRITE)
   create(@CurrentUser() user: JwtUser, @Body() dto: CreatePetDto) {
-    return this.petService.create(user.sub, dto);
+    return this.petService.create(user.protetorId, dto);
   }
 
   @Patch(':id')
@@ -100,7 +105,7 @@ export class PetsController {
     @CurrentUser() user: JwtUser,
     @Body() dto: UpdatePetDto,
   ) {
-    return this.petService.update(id, user.sub, dto);
+    return this.petService.update(id, user.protetorId, dto);
   }
 
   @Delete(':id')
@@ -110,6 +115,6 @@ export class PetsController {
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: JwtUser,
   ) {
-    return this.petService.delete(id, user.sub);
+    return this.petService.delete(id, user.protetorId);
   }
 }

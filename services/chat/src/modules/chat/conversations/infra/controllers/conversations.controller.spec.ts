@@ -11,6 +11,7 @@ describe('ConversationsController', () => {
     findAll: jest.fn(),
     findById: jest.fn(),
     updateStatus: jest.fn(),
+    markAllAsRead: jest.fn(),
   };
 
   const controller = new ConversationsController(service as any);
@@ -60,6 +61,17 @@ describe('ConversationsController', () => {
 
       expect(service.updateStatus).toHaveBeenCalledWith(conversationId, adotanteJwt, dto);
       expect(result).toMatchObject({ isActive: false });
+    });
+  });
+
+  describe('markAllAsRead', () => {
+    it('delegates to service.markAllAsRead', async () => {
+      service.markAllAsRead.mockResolvedValue({ markedAsRead: 3 });
+
+      const result = await controller.markAllAsRead(conversationId, adotanteJwt as any);
+
+      expect(service.markAllAsRead).toHaveBeenCalledWith(conversationId, adotanteJwt);
+      expect(result).toEqual({ markedAsRead: 3 });
     });
   });
 });

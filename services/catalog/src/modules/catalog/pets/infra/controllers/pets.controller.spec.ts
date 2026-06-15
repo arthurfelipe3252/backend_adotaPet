@@ -2,7 +2,7 @@ import { PetsController } from './pets.controller';
 
 const userId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const petId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
-const jwtUser = { sub: userId, permissions: ['pets:read', 'pets:write', 'pets:delete'] };
+const jwtUser = { sub: userId, protetorId: userId, permissions: ['pets:read', 'pets:write', 'pets:delete'] };
 const mockPet = { id: petId, protetorId: userId, nome: 'Rex' };
 
 describe('PetsController', () => {

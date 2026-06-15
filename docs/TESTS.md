@@ -1,6 +1,6 @@
 # Testes — AdotaPet Backend
 
-**22 suites · 178 testes · 6 serviços**
+**23 suites · 183 testes · 6 serviços**
 
 Todos os testes são unitários com instanciação direta de classes (`new Service(mockDep)`). Sem `Test.createTestingModule` — mais rápido, sem overhead do container NestJS.
 
@@ -224,7 +224,7 @@ Delegação: `create` (com `conversationId`), `findByConversation`, `updateReadS
 
 ---
 
-### match — 3 suites · 24 testes
+### match — 4 suites · 29 testes
 
 Sistema de match inteligente entre perfil do adotante e pets disponíveis.
 
@@ -242,20 +242,31 @@ Testa a lógica de score puro (sem I/O):
 | usuário que viaja frequentemente + cão dependente reduz score |
 | score retorna inteiro (arredondado) |
 
-#### `questionario-match.service.spec.ts` — 11 testes
+#### `questionario-match.service.spec.ts` — 12 testes
 
 | Grupo | Testes |
 |---|---|
 | `salvar` | faz upsert e retorna questionário |
 | `buscarMeu` | retorna próprio questionário · NotFoundException quando não existe |
 | `buscarPorAdotante` | ForbiddenException para outro usuário · retorna quando IDs batem |
-| `calcularMeuMatch` | NotFoundException sem questionário · retorna resultado com lista (pode ser vazia) |
-| `calcularMatch` | ForbiddenException para outro usuário · calcula match próprio |
+| `calcularMeuMatch` | NotFoundException sem questionário · rankeia pets disponíveis da réplica local |
+| `calcularMatch` | ForbiddenException para outro usuário · calcula match próprio · ordena resultados por score desc |
 | `remover` | NotFoundException quando não existe · deleta questionário |
 
 #### `questionario-match.controller.spec.ts` — 6 testes
 
 Delegação: `salvar`, `buscarMeu`, `buscarPorAdotante`, `calcularMeuMatch`, `calcularMatch`, `remover`.
+
+#### `catalog-pet-consumer.service.spec.ts` — 4 testes
+
+Consumidor da réplica local de pets (eventos do catalog via RabbitMQ):
+
+| Testes |
+|---|
+| registra os 3 consumidores nas exchanges do catalog |
+| `pet.created` → upsert na réplica `match_pets` |
+| `pet.updated` → upsert na réplica |
+| `pet.deleted` → remove da réplica |
 
 ---
 
@@ -305,6 +316,6 @@ Verifica que todos os endpoints chamam `resolveProtetorId` antes de delegar; tes
 | catalog | 2 | 20 | [jest.config.js](../services/catalog/jest.config.js) |
 | adoption | 2 | 19 | [jest.config.js](../services/adoption/jest.config.js) |
 | chat | 4 | 28 | [jest.config.js](../services/chat/jest.config.js) |
-| match | 3 | 24 | [jest.config.js](../services/match/jest.config.js) |
+| match | 4 | 29 | [jest.config.js](../services/match/jest.config.js) |
 | reports | 3 | 30 | [jest.config.js](../services/reports/jest.config.js) |
-| **Total** | **22** | **178** | |
+| **Total** | **23** | **183** | |

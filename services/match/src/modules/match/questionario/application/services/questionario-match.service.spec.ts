@@ -4,8 +4,8 @@ import { QuestionarioMatch } from '@match/questionario/domain/models/questionari
 
 const adotanteId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const otherId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
-const jwtUser = { sub: adotanteId, tipoUsuario: 'adotante' };
-const outroJwt = { sub: otherId, tipoUsuario: 'adotante' };
+const petId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
+const jwtUser = { sub: adotanteId, adotanteId, tipoUsuario: 'adotante' };
 
 const buildQuestionario = () =>
   QuestionarioMatch.restore({
@@ -30,6 +30,24 @@ const salvarDto = {
   perfilCompanheiro: 'carinhoso',
 };
 
+const buildMatchPetRow = (id = petId) => ({
+  id,
+  protetorId: 'dddddddd-dddd-dddd-dddd-dddddddddddd',
+  nome: 'Rex',
+  especie: 'cao',
+  raca: null,
+  porte: 'medio',
+  sexo: 'macho',
+  idadeMeses: 24,
+  castrado: false,
+  vacinado: true,
+  temperamento: null,
+  status: 'disponivel',
+  fotosUrls: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+});
+
 describe('QuestionarioMatchService', () => {
   const questionarioRepo = {
     upsert: jest.fn(),
@@ -37,11 +55,21 @@ describe('QuestionarioMatchService', () => {
     deleteByAdotanteId: jest.fn(),
   };
 
+  const matchPetRepo = {
+    upsert: jest.fn(),
+    deleteById: jest.fn(),
+    findAvailable: jest.fn().mockResolvedValue([]),
+  };
+
   const scoring = {
     calcularScore: jest.fn().mockReturnValue(85),
   };
 
-  const service = new QuestionarioMatchService(questionarioRepo as any, scoring as any);
+  const service = new QuestionarioMatchService(
+    questionarioRepo as any,
+    matchPetRepo as any,
+    scoring as any,
+  );
 
   beforeEach(() => jest.clearAllMocks());
 
@@ -97,13 +125,17 @@ describe('QuestionarioMatchService', () => {
       await expect(service.calcularMeuMatch(jwtUser)).rejects.toBeInstanceOf(NotFoundException);
     });
 
-    it('returns match result with empty resultados (no pet repo)', async () => {
+    it('ranks available pets from the local replica', async () => {
       questionarioRepo.findByAdotanteId.mockResolvedValue(buildQuestionario());
+      matchPetRepo.findAvailable.mockResolvedValue([buildMatchPetRow()]);
 
       const result = await service.calcularMeuMatch(jwtUser);
 
       expect(result.adotanteId).toBe(adotanteId);
-      expect(result.resultados).toEqual([]);
+      expect(result.totalPetsAnalisados).toBe(1);
+      expect(result.resultados).toHaveLength(1);
+      expect(result.resultados[0].petId).toBe(petId);
+      expect(result.resultados[0].score).toBe(85);
       expect(result.geradoEm).toBeInstanceOf(Date);
     });
   });
@@ -121,6 +153,20 @@ describe('QuestionarioMatchService', () => {
       const result = await service.calcularMatch(adotanteId, jwtUser);
 
       expect(result.adotanteId).toBe(adotanteId);
+    });
+
+    it('sorts results by score descending', async () => {
+      questionarioRepo.findByAdotanteId.mockResolvedValue(buildQuestionario());
+      matchPetRepo.findAvailable.mockResolvedValue([
+        buildMatchPetRow('pet-low'),
+        buildMatchPetRow('pet-high'),
+      ]);
+      scoring.calcularScore.mockReturnValueOnce(40).mockReturnValueOnce(90);
+
+      const result = await service.calcularMatch(adotanteId, jwtUser);
+
+      expect(result.resultados.map((r) => r.score)).toEqual([90, 40]);
+      expect(result.resultados[0].petId).toBe('pet-high');
     });
   });
 
