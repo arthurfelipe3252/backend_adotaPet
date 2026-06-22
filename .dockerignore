@@ -1,15 +1,15 @@
-node_modules
-dist
-coverage
-.nyc_output
+**/node_modules
+**/dist
+**/coverage
+**/.nyc_output
 
 .git
 .gitignore
 .github
 
-.env
-.env.*
-!.env.example
+**/.env
+**/.env.*
+!**/.env.example
 
 *.log
 npm-debug.log*

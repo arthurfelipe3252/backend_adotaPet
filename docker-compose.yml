@@ -1,4 +1,15 @@
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+  depends_on:
+    postgres:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+  networks:
+    - adotapet-network
+
 services:
+  # ── Infraestrutura ──────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
     container_name: adotapet-postgres
@@ -8,9 +19,17 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: adotapet
+      POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adotapet-network
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -20,10 +39,174 @@ services:
       - '5672:5672'
       - '15672:15672'
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adotapet-network
+
+  # ── Microserviços ───────────────────────────────────────────────────
+  user-auth:
+    <<: *service-defaults
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: user-auth
+    environment:
+      PORT: 4001
+      JWT_SECRET: super-secret-change-in-production
+      JWT_ACCESS_EXPIRES_IN: 1d
+      JWT_REFRESH_EXPIRES_IN: 7d
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/adotapet_user_auth
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    ports:
+      - '4001:4001'
+    command: sh -c "npm run db:migrate && npm run start:prod"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "require('http').get('http://localhost:4001/v1/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  catalog:
+    <<: *service-defaults
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: catalog
+    environment:
+      PORT: 4002
+      JWT_SECRET: super-secret-change-in-production
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/adotapet_catalog
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    ports:
+      - '4002:4002'
+    command: sh -c "npm run db:migrate && npm run start:prod"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "require('http').get('http://localhost:4002/v1/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  adoption:
+    <<: *service-defaults
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: adoption
+    environment:
+      PORT: 4003
+      JWT_SECRET: super-secret-change-in-production
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/adotapet_adoption
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    ports:
+      - '4003:4003'
+    command: sh -c "npm run db:migrate && npm run start:prod"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "require('http').get('http://localhost:4003/v1/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  chat:
+    <<: *service-defaults
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: chat
+    environment:
+      PORT: 4004
+      JWT_SECRET: super-secret-change-in-production
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/adotapet_chat
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    ports:
+      - '4004:4004'
+    command: sh -c "npm run db:migrate && npm run start:prod"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "require('http').get('http://localhost:4004/v1/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  match:
+    <<: *service-defaults
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: match
+    environment:
+      PORT: 4005
+      JWT_SECRET: super-secret-change-in-production
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/adotapet_match
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    ports:
+      - '4005:4005'
+    command: sh -c "npm run db:migrate && npm run start:prod"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "require('http').get('http://localhost:4005/v1/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  reports:
+    <<: *service-defaults
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+      args:
+        SERVICE_NAME: reports
+    environment:
+      PORT: 4006
+      JWT_SECRET: super-secret-change-in-production
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/adotapet_reports
+      RABBITMQ_URL: amqp://admin:admin@rabbitmq:5672
+    ports:
+      - '4006:4006'
+    command: sh -c "npm run db:migrate && npm run start:prod"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "require('http').get('http://localhost:4006/v1/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+networks:
+  adotapet-network:
+    driver: bridge
 
 volumes:
   postgres_data:
