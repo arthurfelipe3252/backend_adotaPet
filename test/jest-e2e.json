@@ -13,7 +13,8 @@
     "^@timeline/(.*)$": "<rootDir>/../src/modules/timeline/$1",
     "^@geo/(.*)$": "<rootDir>/../src/modules/geo/$1",
     "^@notifications/(.*)$": "<rootDir>/../src/modules/notifications/$1",
-    "^@payments/(.*)$": "<rootDir>/../src/modules/payments/$1"
+    "^@payments/(.*)$": "<rootDir>/../src/modules/payments/$1",
+    "^@reports/(.*)$": "<rootDir>/../src/modules/reports/$1"
   },
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"

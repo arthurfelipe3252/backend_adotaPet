@@ -33,6 +33,9 @@ describe('MessageService', () => {
     update: jest.fn(),
     findById: jest.fn(),
     findByConversation: jest.fn(),
+    countUnreadByConversationForViewer: jest.fn(),
+    findLastMessageByConversation: jest.fn(),
+    markAllAsReadInConversation: jest.fn(),
   };
 
   const conversationRepository = {
