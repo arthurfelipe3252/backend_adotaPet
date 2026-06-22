@@ -1,3 +1,4 @@
+import { describe, beforeEach, it, expect, jest } from '@jest/globals';
 import { AuthController } from './auth.controller';
 import type { Request } from 'express';
 
@@ -14,9 +15,19 @@ describe('AuthController', () => {
     logoutAll: jest.fn(),
   };
 
-  const controller = new AuthController(authService as any);
+  const forgotPasswordService = {
+    requestReset: jest.fn(),
+    confirmReset: jest.fn(),
+  };
 
-  beforeEach(() => jest.clearAllMocks());
+  const controller = new AuthController(
+    authService as any,
+    forgotPasswordService as any,
+  );
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  });
 
   describe('login', () => {
     it('delegates to authService.login with extracted meta', async () => {
@@ -69,6 +80,28 @@ describe('AuthController', () => {
       await controller.logoutAll(autenticado as any);
 
       expect(authService.logoutAll).toHaveBeenCalledWith('user-id-001');
+    });
+  });
+
+  describe('forgotPassword', () => {
+    it('delegates to forgotPasswordService.requestReset', async () => {
+      const dto = { email: 'user@test.com' };
+      forgotPasswordService.requestReset.mockResolvedValue(undefined);
+
+      await controller.forgotPassword(dto as any);
+
+      expect(forgotPasswordService.requestReset).toHaveBeenCalledWith(dto);
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('delegates to forgotPasswordService.confirmReset', async () => {
+      const dto = { token: 'token-value', novaSenha: 'novaSenhaSegura456' };
+      forgotPasswordService.confirmReset.mockResolvedValue(undefined);
+
+      await controller.resetPassword(dto as any);
+
+      expect(forgotPasswordService.confirmReset).toHaveBeenCalledWith(dto);
     });
   });
 });

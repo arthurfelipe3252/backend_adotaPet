@@ -4,6 +4,7 @@
     "outDir": "./dist",
     "rootDir": "../..",
     "baseUrl": "./",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@shared/*": [
         "../../shared/src/*"
@@ -42,9 +43,15 @@
         "node_modules/cpf-cnpj-validator"
       ]
     },
-    "typeRoots": [
+"typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "types": [
+      "jest"
+    ],
+    "strict": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false
   },
   "include": [
     "src",
