@@ -15,7 +15,7 @@ export async function bootstrapHttpApp(
 ): Promise<void> {
   const app = await NestFactory.create(AppModule as any);
 
-  app.enableCors({ origin: '*', credentials: true });
+  app.enableCors({ origin: true, credentials: true });
   app.use(json({ limit: '20mb' }));
 
   const prefix = options.globalPrefix ?? 'v1';
