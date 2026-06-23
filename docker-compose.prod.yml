@@ -65,19 +65,10 @@ services:
         condition: service_started
       reports:
         condition: service_started
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=easypanel"
-      - "traefik.http.routers.adotapet-api.rule=Host(`adotapet-api.upperlavtech.com`)"
-      - "traefik.http.routers.adotapet-api.entrypoints=websecure"
-      - "traefik.http.routers.adotapet-api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.adotapet-api.service=adotapet-api"
-      - "traefik.http.services.adotapet-api.loadbalancer.server.port=8080"
+    ports:
+      - "127.0.0.1:18080:8080"
     networks:
-      adotapet-network:
-      easypanel:
-        aliases:
-          - apps_adotapet_api
+      - adotapet-network
 
   # ── Microserviços (imagens pré-buildadas no CI → GHCR) ──────────────
   user-auth:
@@ -199,8 +190,6 @@ services:
 networks:
   adotapet-network:
     driver: bridge
-  easypanel:
-    external: true
 
 volumes:
   postgres_data:
