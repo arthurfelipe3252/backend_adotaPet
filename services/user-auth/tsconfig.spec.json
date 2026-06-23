@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "strict": false,
-    "strictNullChecks": false,
-    "noImplicitAny": false
-  },
-  "include": ["src/**/*.spec.ts", "src/**/*.test.ts"]
-}
