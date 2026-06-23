@@ -47,9 +47,10 @@ services:
       - adotapet-network
 
   # ── Gateway (nginx) ─────────────────────────────────────────────────
-  # Exposição é gerenciada pelo Traefik do Easypanel — configurar
-  # "Domains" no painel apontando pra service `gateway` na porta interna
-  # 8080. NÃO declarar `ports:` aqui (conflita com o Traefik e impede o
+  # Exposição via Traefik do Easypanel. O gateway fica em DUAS redes:
+  #   - adotapet-network: pra alcançar os 6 microsserviços internos
+  #   - easypanel:        pra ser alcançado pelo Traefik (rede externa)
+  # NÃO declarar `ports:` aqui (conflita com o Traefik e impede o
   # Easypanel de detectar o estado do serviço — fica cinza no painel).
   gateway:
     image: nginx:alpine
@@ -71,6 +72,14 @@ services:
         condition: service_started
     networks:
       - adotapet-network
+      - easypanel
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=easypanel"
+      - "traefik.http.routers.adotapet-gateway.rule=Host(`adotapet-api.upperlavtech.com`)"
+      - "traefik.http.routers.adotapet-gateway.entrypoints=websecure"
+      - "traefik.http.routers.adotapet-gateway.tls.certresolver=letsencrypt"
+      - "traefik.http.services.adotapet-gateway.loadbalancer.server.port=8080"
 
   # ── Microserviços (imagens pré-buildadas no CI → GHCR) ──────────────
   user-auth:
@@ -192,6 +201,11 @@ services:
 networks:
   adotapet-network:
     driver: bridge
+  # Rede do Traefik do Easypanel — criada pelo próprio Easypanel.
+  # O gateway entra nela pra ser alcançado pelo proxy reverso.
+  easypanel:
+    external: true
+    name: easypanel
 
 volumes:
   postgres_data:
