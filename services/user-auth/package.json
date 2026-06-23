@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "nest build --webpack && tsc-alias -p tsconfig.build.json || true",
+    "build": "nest build && tsc-alias -p tsconfig.build.json",
     "start:prod": "node dist/services/user-auth/src/main.js",
     "dev": "nest start --watch",
     "db:generate": "drizzle-kit generate",

@@ -15,12 +15,9 @@ import {
 } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { AuthResponseDto } from '@identity/usuarios/application/dto/auth-response.dto';
-import { ForgotPasswordDto } from '@identity/usuarios/application/dto/forgot-password.dto';
 import { LoginDto } from '@identity/usuarios/application/dto/login.dto';
 import { RefreshTokenDto } from '@identity/usuarios/application/dto/refresh-token.dto';
-import { ResetPasswordDto } from '@identity/usuarios/application/dto/reset-password.dto';
 import { AuthService } from '@identity/usuarios/application/services/auth.service';
-import { ForgotPasswordService } from '@identity/usuarios/application/services/forgot-password.service';
 import { LoginMeta } from '@identity/usuarios/application/types/login-meta.type';
 import type { AuthenticatedUser } from '@identity/usuarios/infra/auth/types/authenticated-user.type';
 import { CurrentUser } from '@identity/usuarios/infra/decorators/current-user.decorator';
@@ -29,10 +26,7 @@ import { Public } from '@identity/usuarios/infra/decorators/public.decorator';
 @ApiTags('Auth')
 @Controller('users/auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly forgotPasswordService: ForgotPasswordService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   // ----------------------------------------------------------------
   // POST /auth/login
@@ -131,53 +125,6 @@ export class AuthController {
     @CurrentUser() autenticado: AuthenticatedUser,
   ): Promise<void> {
     await this.authService.logoutAll(autenticado.id);
-  }
-
-  // ----------------------------------------------------------------
-  // POST /auth/forgot-password
-  // ----------------------------------------------------------------
-  @Post('forgot-password')
-  @Public()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({
-    summary: 'Solicita recuperação de senha',
-    description:
-      'Se o email existir e estiver ativo, envia um link de redefinição ' +
-      'por e-mail (válido por 30 minutos). A resposta é SEMPRE 204, exista ' +
-      'ou não o email — isso evita que alguém descubra quais emails estão ' +
-      'cadastrados (user enumeration).',
-  })
-  @ApiBody({ type: ForgotPasswordDto })
-  @ApiResponse({
-    status: 204,
-    description: 'Solicitação processada (independente do email existir)',
-  })
-  @ApiResponse({ status: 400, description: 'Email em formato inválido' })
-  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<void> {
-    await this.forgotPasswordService.requestReset(dto);
-  }
-
-  // ----------------------------------------------------------------
-  // POST /auth/reset-password
-  // ----------------------------------------------------------------
-  @Post('reset-password')
-  @Public()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({
-    summary: 'Confirma a recuperação de senha com o token recebido por e-mail',
-    description:
-      'Troca a senha do usuário dono do token e revoga todas as sessões ' +
-      'ativas (refresh tokens) por segurança.',
-  })
-  @ApiBody({ type: ResetPasswordDto })
-  @ApiResponse({ status: 204, description: 'Senha redefinida com sucesso' })
-  @ApiResponse({ status: 400, description: 'Dados de entrada inválidos' })
-  @ApiResponse({
-    status: 401,
-    description: 'Token inválido, expirado ou já utilizado',
-  })
-  async resetPassword(@Body() dto: ResetPasswordDto): Promise<void> {
-    await this.forgotPasswordService.confirmReset(dto);
   }
 
   // ----------------------------------------------------------------
