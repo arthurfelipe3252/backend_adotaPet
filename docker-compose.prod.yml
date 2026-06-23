@@ -1,5 +1,6 @@
 x-service-defaults: &service-defaults
   restart: unless-stopped
+  pull_policy: always
   depends_on:
     postgres:
       condition: service_healthy
