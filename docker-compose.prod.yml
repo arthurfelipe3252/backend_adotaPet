@@ -47,6 +47,10 @@ services:
       - adotapet-network
 
   # ── Gateway (nginx) ─────────────────────────────────────────────────
+  # Exposição é gerenciada pelo Traefik do Easypanel — configurar
+  # "Domains" no painel apontando pra service `gateway` na porta interna
+  # 8080. NÃO declarar `ports:` aqui (conflita com o Traefik e impede o
+  # Easypanel de detectar o estado do serviço — fica cinza no painel).
   gateway:
     image: nginx:alpine
     restart: unless-stopped
@@ -65,8 +69,6 @@ services:
         condition: service_started
       reports:
         condition: service_started
-    ports:
-      - "127.0.0.1:18080:8080"
     networks:
       - adotapet-network
 
