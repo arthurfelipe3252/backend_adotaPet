@@ -73,8 +73,10 @@ services:
       reports:
         condition: service_started
     networks:
-      - adotapet-network
-      - easypanel
+      adotapet-network:
+      easypanel:
+        aliases:
+          - apps_adotapet_api
 
   # ── Microserviços (imagens pré-buildadas no CI → GHCR) ──────────────
   user-auth:
