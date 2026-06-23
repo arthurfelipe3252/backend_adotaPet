@@ -44,14 +44,34 @@ services:
     networks:
       - adotapet-network
 
-  # ── Microserviços ───────────────────────────────────────────────────
+  # ── Gateway (nginx) ─────────────────────────────────────────────────
+  gateway:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      user-auth:
+        condition: service_healthy
+      catalog:
+        condition: service_healthy
+      adoption:
+        condition: service_healthy
+      chat:
+        condition: service_healthy
+      match:
+        condition: service_healthy
+      reports:
+        condition: service_healthy
+    networks:
+      - adotapet-network
+
+  # ── Microserviços (imagens pré-buildadas no CI → GHCR) ──────────────
   user-auth:
     <<: *service-defaults
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        SERVICE_NAME: user-auth
+    image: ghcr.io/arthurfelipe3252/backend_adotapet-user-auth:latest
     environment:
       PORT: 4001
       JWT_SECRET: ${JWT_SECRET}
@@ -72,11 +92,7 @@ services:
 
   catalog:
     <<: *service-defaults
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        SERVICE_NAME: catalog
+    image: ghcr.io/arthurfelipe3252/backend_adotapet-catalog:latest
     environment:
       PORT: 4002
       JWT_SECRET: ${JWT_SECRET}
@@ -95,11 +111,7 @@ services:
 
   adoption:
     <<: *service-defaults
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        SERVICE_NAME: adoption
+    image: ghcr.io/arthurfelipe3252/backend_adotapet-adoption:latest
     environment:
       PORT: 4003
       JWT_SECRET: ${JWT_SECRET}
@@ -118,11 +130,7 @@ services:
 
   chat:
     <<: *service-defaults
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        SERVICE_NAME: chat
+    image: ghcr.io/arthurfelipe3252/backend_adotapet-chat:latest
     environment:
       PORT: 4004
       JWT_SECRET: ${JWT_SECRET}
@@ -141,11 +149,7 @@ services:
 
   match:
     <<: *service-defaults
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        SERVICE_NAME: match
+    image: ghcr.io/arthurfelipe3252/backend_adotapet-match:latest
     environment:
       PORT: 4005
       JWT_SECRET: ${JWT_SECRET}
@@ -164,11 +168,7 @@ services:
 
   reports:
     <<: *service-defaults
-    build:
-      context: .
-      dockerfile: Dockerfile.service
-      args:
-        SERVICE_NAME: reports
+    image: ghcr.io/arthurfelipe3252/backend_adotapet-reports:latest
     environment:
       PORT: 4006
       JWT_SECRET: ${JWT_SECRET}
