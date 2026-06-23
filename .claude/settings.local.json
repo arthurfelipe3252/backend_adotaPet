@@ -65,7 +65,8 @@
       "Bash(grep -v \"^$\")",
       "Bash(git fetch *)",
       "Bash(xargs grep -l \"JwtService\\\\|sign\\(\")",
-      "Bash(xargs grep -l \"JwtAuthGuard\\\\|@Public\\\\|JwtStrategy\")"
+      "Bash(xargs grep -l \"JwtAuthGuard\\\\|@Public\\\\|JwtStrategy\")",
+      "Bash(grep -v \"//\\\\|\\\\*\")"
     ]
   }
 }
