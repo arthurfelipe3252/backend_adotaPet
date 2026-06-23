@@ -65,6 +65,14 @@ services:
         condition: service_started
       reports:
         condition: service_started
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=easypanel"
+      - "traefik.http.routers.adotapet-api.rule=Host(`adotapet-api.upperlavtech.com`)"
+      - "traefik.http.routers.adotapet-api.entrypoints=websecure"
+      - "traefik.http.routers.adotapet-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.adotapet-api.service=adotapet-api"
+      - "traefik.http.services.adotapet-api.loadbalancer.server.port=8080"
     networks:
       adotapet-network:
       easypanel:
