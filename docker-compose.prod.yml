@@ -54,17 +54,17 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       user-auth:
-        condition: service_healthy
+        condition: service_started
       catalog:
-        condition: service_healthy
+        condition: service_started
       adoption:
-        condition: service_healthy
+        condition: service_started
       chat:
-        condition: service_healthy
+        condition: service_started
       match:
-        condition: service_healthy
+        condition: service_started
       reports:
-        condition: service_healthy
+        condition: service_started
     networks:
       - adotapet-network
 
@@ -88,7 +88,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 40s
+      start_period: 90s
 
   catalog:
     <<: *service-defaults
@@ -107,7 +107,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 40s
+      start_period: 90s
 
   adoption:
     <<: *service-defaults
@@ -126,7 +126,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 40s
+      start_period: 90s
 
   chat:
     <<: *service-defaults
@@ -145,7 +145,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 40s
+      start_period: 90s
 
   match:
     <<: *service-defaults
@@ -164,7 +164,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 40s
+      start_period: 90s
 
   reports:
     <<: *service-defaults
@@ -183,7 +183,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 40s
+      start_period: 90s
 
 networks:
   adotapet-network:
