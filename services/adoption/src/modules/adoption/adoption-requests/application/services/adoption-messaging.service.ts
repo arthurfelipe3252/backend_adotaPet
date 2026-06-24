@@ -32,6 +32,7 @@ export class AdoptionMessagingService implements OnApplicationBootstrap {
 
   async publishRequestUpdated(payload: {
     id: string;
+    petId: string;
     status: string;
     adopterId?: string;
     protetorId?: string;

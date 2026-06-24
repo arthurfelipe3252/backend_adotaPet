@@ -34,7 +34,7 @@ export class DrizzleAdoptionRequestRepository implements AdoptionRequestReposito
         updatedAt: request.updatedAt ?? new Date(),
       })
       .returning();
-    return this.mapToEntity(row)!;
+    return this.mapToEntity(row as AdoptionRequestRecord)!;
   }
 
   async update(request: AdoptionRequest): Promise<void> {
@@ -70,22 +70,33 @@ export class DrizzleAdoptionRequestRepository implements AdoptionRequestReposito
     }
 
     const query = this.drizzle.db.select().from(adoptionRequestsSchema);
-    const rows = where.length
+    const rows: AdoptionRequestRecord[] = where.length
       ? await query.where(where.length === 1 ? where[0] : and(...where))
       : await query;
 
     return rows
-      .map((row) => this.mapToEntity(row))
+      .map((row: AdoptionRequestRecord) => this.mapToEntity(row))
       .filter((row): row is AdoptionRequest => row !== null);
   }
 
   async findById(id: string): Promise<AdoptionRequest | null> {
-    const rows = await this.drizzle.db
+    const rows: AdoptionRequestRecord[] = await this.drizzle.db
       .select()
       .from(adoptionRequestsSchema)
       .where(eq(adoptionRequestsSchema.id, id));
 
     return this.mapToEntity(rows[0]);
+  }
+
+  async findByPetId(petId: string): Promise<AdoptionRequest[]> {
+    const rows: AdoptionRequestRecord[] = await this.drizzle.db
+      .select()
+      .from(adoptionRequestsSchema)
+      .where(eq(adoptionRequestsSchema.petId, petId));
+
+    return rows
+      .map((row: AdoptionRequestRecord) => this.mapToEntity(row))
+      .filter((row): row is AdoptionRequest => row !== null);
   }
 
   private mapToEntity(record?: AdoptionRequestRecord): AdoptionRequest | null {

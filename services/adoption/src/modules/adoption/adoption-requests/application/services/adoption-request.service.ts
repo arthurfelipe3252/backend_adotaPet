@@ -121,11 +121,19 @@ export class AdoptionRequestService {
     await this.repository.update(request);
     await this.messagingService.publishRequestUpdated({
       id: request.id!,
+      petId: request.petId,
       status: dto.status,
       adopterId: request.adopterId,
       protetorId: user.protetorId!,
       updatedAt: (request.updatedAt ?? new Date()).toISOString(),
     });
+
+    // Quando aprovada: rejeitar automaticamente todas as outras solicitações
+    // do mesmo pet para garantir que apenas uma adoção seja aceita.
+    if (dto.status === 'approved') {
+      await this.rejectOtherRequestsForPet(request.petId, request.id!);
+    }
+
     return this.withProfiles(request);
   }
 
@@ -136,6 +144,24 @@ export class AdoptionRequestService {
       throw new ForbiddenException('Apenas o adotante criador pode excluir');
     }
     await this.repository.delete(id);
+  }
+
+  /**
+   * Rejeita todas as solicitações pendentes do mesmo pet, exceto a que
+   * acabou de ser aprovada. Garante que apenas uma adoção seja aceita por pet.
+   */
+  private async rejectOtherRequestsForPet(petId: string, approvedRequestId: string): Promise<void> {
+    const allRequests = await this.repository.findByPetId(petId);
+    const now = new Date();
+
+    for (const r of allRequests) {
+      if (r.id === approvedRequestId) continue;
+      // Rejeitar apenas solicitações que ainda não foram finalizadas
+      if (r.status === 'approved' || r.status === 'rejected') continue;
+
+      r.withStatus('rejected').touch(now);
+      await this.repository.update(r);
+    }
   }
 
   private mapToResponse(

@@ -20,4 +20,6 @@ export interface AdoptionRequestRepository {
   delete(id: string): Promise<void>;
   findAll(filters?: AdoptionRequestFilters): Promise<AdoptionRequest[]>;
   findById(id: string): Promise<AdoptionRequest | null>;
+  /** Retorna todas as solicitações para um pet específico. */
+  findByPetId(petId: string): Promise<AdoptionRequest[]>;
 }

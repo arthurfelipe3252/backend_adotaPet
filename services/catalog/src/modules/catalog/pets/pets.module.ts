@@ -7,6 +7,7 @@ import { PET_REPOSITORY } from './domain/repositories/pet-repository.interface';
 import { DrizzleProfileRepository } from '@catalog/profiles/infra/repositories/drizzle-profile.repository';
 import { PROFILE_REPOSITORY } from '@catalog/profiles/domain/repositories/profile-repository.interface';
 import { UserAuthEventConsumer } from '@catalog/profiles/infra/consumers/user-auth-event-consumer.service';
+import { AdoptionEventConsumer } from './infra/consumers/adoption-event-consumer.service';
 
 @Module({
   controllers: [PetsController],
@@ -25,6 +26,8 @@ import { UserAuthEventConsumer } from '@catalog/profiles/infra/consumers/user-au
       useExisting: DrizzleProfileRepository,
     },
     UserAuthEventConsumer,
+    // Consome eventos do serviço de adoção → atualiza status do pet para 'adotado'
+    AdoptionEventConsumer,
   ],
   exports: [PetService, PET_REPOSITORY, DrizzlePetRepository],
 })
