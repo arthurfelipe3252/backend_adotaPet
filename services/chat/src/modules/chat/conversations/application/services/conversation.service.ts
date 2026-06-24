@@ -55,15 +55,16 @@ export class ConversationService {
   ) {}
 
   async create(user: JwtUser, dto: CreateConversationDto): Promise<ConversationResponseDto> {
-    // A conversa é materializada via evento de adoção aprovada (createInternal),
-    // que é a ÚNICA fonte com adopterId + protetorId corretos. O chat não tem os
-    // dados da adoção pra resolver o protetorId aqui. Então este endpoint só
-    // devolve a conversa já criada (idempotente) — nunca insere com id vazio.
+    // A conversa é materializada via evento de adoção (createInternal) quando a
+    // solicitação entra em análise ou é aprovada — a ÚNICA fonte com adopterId +
+    // protetorId corretos. O chat não tem os dados da adoção pra resolver o
+    // protetorId aqui. Então este endpoint só devolve a conversa já criada
+    // (idempotente) — nunca insere com id vazio.
     const existing = await this.repository.findByAdoptionRequestId(dto.adoptionRequestId);
     if (existing) return this.toResponseSingle(existing, profileId(user));
 
     throw new BadRequestException(
-      'A conversa é criada automaticamente quando a adoção é aprovada.',
+      'A conversa é criada automaticamente quando a adoção entra em análise ou é aprovada.',
     );
   }
 

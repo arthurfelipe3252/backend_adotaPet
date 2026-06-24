@@ -13,6 +13,13 @@ interface AdoptionRequestUpdatedEvent {
   protetorId?: string;
 }
 
+/**
+ * Status da solicitação que disparam a abertura automática da conversa.
+ * `in_analysis` permite adotante e protetor conversarem durante a análise;
+ * `approved` mantém a conversa após a aprovação.
+ */
+const STATUSES_THAT_OPEN_CONVERSATION = ['in_analysis', 'approved'];
+
 @Injectable()
 export class AdoptionEventConsumer implements OnApplicationBootstrap {
   private readonly logger = new Logger(AdoptionEventConsumer.name);
@@ -29,7 +36,7 @@ export class AdoptionEventConsumer implements OnApplicationBootstrap {
       'chat.service.adoption-request-updated',
       async (payload) => {
         const event = payload as AdoptionRequestUpdatedEvent;
-        if (event.status !== 'approved') return;
+        if (!STATUSES_THAT_OPEN_CONVERSATION.includes(event.status)) return;
         if (!event.adopterId || !event.protetorId) return;
 
         this.logger.log(`Auto-creating conversation for adoption ${event.id}`);

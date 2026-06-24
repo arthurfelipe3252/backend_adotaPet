@@ -7,7 +7,8 @@ Plataforma de adoção responsável de pets. Conecta ONGs e protetores independe
 Monorepo de microsserviços NestJS com Clean Architecture e DDD. Cada serviço possui banco de dados próprio (PostgreSQL) e se comunica de forma assíncrona via RabbitMQ.
 
 ```
-├── shared/           # Módulo compartilhado (auth JWT, HATEOAS, RabbitMQ, DrizzleService)
+├── shared/           # Módulo compartilhado (auth JWT, HATEOAS, RabbitMQ, DrizzleService, contratos de evento)
+├── nginx/            # Gateway (reverse proxy) — roteia /v1/* para os 6 serviços
 └── services/
     ├── user-auth/    # Porta 4001 — autenticação, cadastro de usuários, adotantes, protetores/ONGs
     ├── catalog/      # Porta 4002 — catálogo de pets (fotos, temperamento, porte)
@@ -19,10 +20,16 @@ Monorepo de microsserviços NestJS com Clean Architecture e DDD. Cada serviço p
 
 ### Comunicação assíncrona (RabbitMQ)
 
-| Publicador | Evento | Consumidor |
+Cada serviço publica eventos de domínio em *exchanges* `direct` duráveis. Os consumidores
+mantêm **réplicas locais read-only** dos dados de que precisam (em vez de chamar outro
+serviço via HTTP) — ex.: `profiles`, `adoption_pets`, `match_pets`, `report_*`. Os contratos
+de evento (exchanges, routing keys e payloads tipados) ficam em `shared/src/contracts/events/`.
+
+| Publicador | Eventos (routing key) | Consumidores |
 |---|---|---|
-| `catalog` | `pet.created`, `pet.updated`, `pet.deleted` | `reports` (materializa dados locais), `match` (réplica local pra scoring) |
-| `adoption` | `adoption-request.created`, `adoption-request.updated` | `chat` (abre conversa ao aprovar), `reports` |
+| `user-auth` | `user.created`, `user.updated`, `user.deleted` | `catalog`, `adoption`, `chat` — réplica local de perfis (`profiles`) |
+| `catalog` | `pet.created`, `pet.updated`, `pet.deleted` | `match` (réplica `match_pets` pra scoring), `adoption` (réplica `adoption_pets`), `reports` (`report_pets`) |
+| `adoption` | `adoption-request.created`, `adoption-request.updated`, `adoption-request.deleted` | `chat` (abre conversa ao aprovar), `catalog` (marca pet como `adotado`), `reports` |
 | `chat` | `conversation.created`, `message.created` | `reports` |
 
 ## Pré-requisitos
@@ -126,9 +133,30 @@ O Dockerfile genérico (`Dockerfile.service`) aceita `ARG SERVICE_NAME` e já ex
 docker compose up --build
 ```
 
+### Gateway e deploy de produção
+
+Em produção um **gateway nginx** (`nginx/nginx.conf`) expõe uma única entrada e roteia por path
+para os serviços internos:
+
+| Path | Serviço |
+|---|---|
+| `/v1/users` | user-auth |
+| `/v1/pets` | catalog |
+| `/v1/adoptions` | adoption |
+| `/v1/chat` | chat |
+| `/v1/match` | match |
+| `/v1/reports` | reports |
+
+Pipeline de deploy (GitHub Actions):
+
+1. Push em `main` → **CI** (`.github/workflows/ci.yml`) roda lint + build + `db:check` por serviço (matriz dos 6).
+2. **`docker-publish.yml`** builda e publica as 6 imagens no **GHCR** (`ghcr.io/<owner>/backend_adotapet-<serviço>`).
+3. **`deploy.yml`** dispara o webhook do **Easypanel** — só se o CI passou em `main`.
+4. **`docker-compose.prod.yml`** puxa as imagens do GHCR; o gateway fica atrás do **Traefik** (TLS Let's Encrypt) e a API fica pública em `https://adotapet-api.upperlavtech.com/v1`.
+
 ## Testes
 
-**23 suites · 183 testes unitários** cobrindo todos os serviços.
+**23 suites · 186 testes unitários** cobrindo todos os serviços.
 
 ```bash
 # Dentro de cada serviço
@@ -144,10 +172,10 @@ npm run test:cov      # com coverage
 | user-auth | 8 | 57 |
 | catalog | 2 | 20 |
 | adoption | 2 | 19 |
-| chat | 4 | 28 |
+| chat | 4 | 31 |
 | match | 4 | 29 |
 | reports | 3 | 30 |
-| **Total** | **23** | **183** |
+| **Total** | **23** | **186** |
 
 Documentação completa dos testes: [docs/TESTS.md](docs/TESTS.md)
 
